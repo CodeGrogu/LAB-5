@@ -31,6 +31,14 @@
   --card-title-color: var(--dark);
   --card-text-color: var(--gray);
   --card-text-margin: 10px 0 0;
+
+  --btn-display: inline-block;
+  --btn-padding: 10px 20px;
+  --btn-background-color: var(--primary);
+  --btn-color: var(--white);
+  --btn-border: none;
+  --btn-border-radius: 5px;
+  --btn-cursor: pointer;
   
   --text-color: #212529;
   --border-color: #e9ecef;
