@@ -100,47 +100,67 @@ p {
 .dark-theme .form-textarea {
   /* TODO: Add dark theme form control styles */
   /* HINT: Use background-color, color, and border-color */
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
 }
 
 .dark-theme .table th {
   /* TODO: Add dark theme table header styles */
   /* HINT: Use background-color */
+  background-color: var(--dark);
 }
 
 .dark-theme .code-editor {
   /* TODO: Add dark theme code editor styles */
   /* HINT: Use background-color */
+  background-color: var(--card-bg);
 }
 
 /* Card Styles */
 .card {
   /* TODO: Add card styles */
   /* HINT: Use background-color, border-radius, box-shadow, transition */
+  background-color: var(--card-bg);
+  border-radius: 10px;
+  box-shadow: var(--card-shadow);
+  transition: var(--transition);
 }
 
 .card:hover {
   /* TODO: Add hover styles for card */
   /* HINT: Use transform and box-shadow */
+  transform: var(--transform);
+  box-shadow: var(--card-hover-shadow);
 }
 
 .card-img {
   /* TODO: Add card image styles */
   /* HINT: Set width, height, and object-fit */
+  width: var(--card-image-width);
+  height: var(--card-image-height);
+  object-fit: cover;
 }
 
 .card-content {
   /* TODO: Add card content styles */
   /* HINT: Add padding */
+  padding: var(--card-content-padding);
 }
 
 .card-title {
   /* TODO: Add card title styles */
   /* HINT: Set font-size, margin, and color */
+  font-size: var(--card-title-font-size);
+  margin: var(--card-title-margin);
+  color: var(--card-title-color);
 }
 
 .card-text {
   /* TODO: Add card text styles */
   /* HINT: Set color and margin */
+  color: var(--card-text-color);
+  margin: var(--card-text-margin);
 }
 
 /* Button Styles */
