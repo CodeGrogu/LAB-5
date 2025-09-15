@@ -16,12 +16,13 @@
   --gray: #6c757d;
   --light-gray: #e9ecef;
   --white: #ffffff;
-  --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   --transition: all 0.3s ease;
   --transform: scale(1.02);
-  --card-hover-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
   --body-bg: #f5f7ff;
+
   --card-bg: #ffffff;
+  --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --card-hover-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
   --card-image-width: 100%;
   --card-image-height: 200px;
   --card-content-padding: 15px;
