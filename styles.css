@@ -17,44 +17,12 @@
   --light-gray: #e9ecef;
   --white: #ffffff;
   --transition: all 0.3s ease;
-  --transform: scale(1.02);
   --body-bg: #f5f7ff;
-
-  --card-bg: #ffffff;
-  --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --card-hover-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-  --card-image-width: 100%;
-  --card-image-height: 200px;
-  --card-content-padding: 15px;
-  --card-title-font-size: 1.5rem;
-  --card-title-margin: 10px 0;
-  --card-title-color: var(--dark);
-  --card-text-color: var(--gray);
-  --card-text-margin: 10px 0 0;
-
-  --btn-display: inline-block;
-  --btn-padding: 10px 20px;
-  --btn-background-color: var(--primary);
-  --btn-color: var(--white);
-  --btn-border: none;
-  --btn-border-radius: 5px;
-  --btn-cursor: pointer;
-  
   --text-color: #212529;
-  --border-color: #e9ecef;
-}
-
-/* Compatibility aliases and missing tokens (map to existing colours/values) */
-:root {
-  --border: var(--border-color);
-  --box-shadow: var(--card-shadow);
-  --background: var(--card-bg);
-  --comment: var(--gray);
-  --selector: var(--primary);
-  --property: var(--info);
-  --value: var(--success);
-  --text: var(--text-color);
-  --dark-gray: var(--dark);
+  --border-color: #dee2e6;
+  --card-bg: #ffffff;
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --card-hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 body {
@@ -101,1330 +69,1005 @@ p {
 
 .section {
   background-color: var(--card-bg);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 25px;
   margin-bottom: 30px;
   box-shadow: var(--card-shadow);
+  border: 1px solid var(--border-color);
 }
 
 .component-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+  gap: 24px;
   margin-top: 20px;
 }
 
 /* ========== IMPLEMENT THE STYLES BELOW ========== */
 
-/* Dark theme specific overrides */
-.dark-theme .form-input,
-.dark-theme .form-select,
-.dark-theme .form-textarea {
-  /* TODO: Add dark theme form control styles */
-  /* HINT: Use background-color, color, and border-color */
-  background-color: var(--card-bg);
-  color: var(--text-color);
-  border-color: var(--border-color);
+/* Dark theme overrides */
+body.dark-theme {
+    --primary: #7b68ee;
+    --secondary: #4cc9f0;
+    --light: #2d3748;
+    --dark: #f8f9fa;
+    --body-bg: #1a202c;
+    --card-bg: #2d3748;
+    --text-color: #e2e8f0;
+    --border-color: #4a5568;
+    --gray: #a0aec0;
+    --light-gray: #4a5568;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    --card-hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
 }
 
-.dark-theme .table th {
-  /* TODO: Add dark theme table header styles */
-  /* HINT: Use background-color */
-  background-color: var(--dark);
-}
-
-.dark-theme .code-editor {
-  /* TODO: Add dark theme code editor styles */
-  /* HINT: Use background-color */
-  background-color: var(--card-bg);
-}
-
-/* Card Styles */
+/* Card */
 .card {
-  /* TODO: Add card styles */
-  /* HINT: Use background-color, border-radius, box-shadow, transition */
-  background-color: var(--card-bg);
-  border-radius: 10px;
-  box-shadow: var(--card-shadow);
-  transition: var(--transition);
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
 }
 
 .card:hover {
-  /* TODO: Add hover styles for card */
-  /* HINT: Use transform and box-shadow */
-  transform: var(--transform);
-  box-shadow: var(--card-hover-shadow);
+    transform: translateY(-5px);
+    box-shadow: var(--card-hover-shadow);
 }
 
 .card-img {
-  /* TODO: Add card image styles */
-  /* HINT: Set width, height, and object-fit */
-  width: var(--card-image-width);
-  height: var(--card-image-height);
-  object-fit: cover;
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
 }
 
 .card-content {
-  /* TODO: Add card content styles */
-  /* HINT: Add padding */
-  padding: var(--card-content-padding);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
 .card-title {
-  /* TODO: Add card title styles */
-  /* HINT: Set font-size, margin, and color */
-  font-size: var(--card-title-font-size);
-  margin: var(--card-title-margin);
-  color: var(--card-title-color);
+    font-size: 20px;
+    color: var(--text-color);
+    margin: 0 0 8px 0;
 }
 
 .card-text {
-  /* TODO: Add card text styles */
-  /* HINT: Set color and margin */
-  color: var(--card-text-color);
-  margin: var(--card-text-margin);
+    color: var(--gray);
+    flex-grow: 1;
+    margin-bottom: 24px;
+    font-size: 14px;
 }
 
-/* Button Styles */
+/* Buttons */
 .btn {
-  /* TODO: Add button styles */
-  /* HINT: Use display, padding, background-color, color, border, border-radius, cursor, transition */
-  display: var(--btn-display);
-  padding: var(--btn-padding);
-  background-color: var(--btn-background-color);
-  color: var(--btn-color);
-  border: var(--btn-border);
-  border-radius: var(--btn-border-radius);
-  cursor: var(--btn-cursor);
-  transition: var(--transition);
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    background-color: var(--primary);
+    color: var(--white);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
 }
 
 .btn:hover {
-  /* TODO: Add button hover styles */
-  /* HINT: Change background-color */
-  background-color: var(--secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    opacity: 0.9;
 }
 
-.btn-success {
-  /* TODO: Add success button styles */
-  /* HINT: Change background-color */
-  background-color: var(--success);
+.btn:active {
+    transform: translateY(0);
+    box-shadow: none;
 }
 
-.btn-warning {
-  /* TODO: Add warning button styles */
-  /* HINT: Change background-color */
-  background-color: var(--warning);
+.btn:disabled {
+    background-color: var(--light-gray);
+    color: var(--gray);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
-.btn-info {
-  /* TODO: Add info button styles */
-  /* HINT: Change background-color */
-  background-color: var(--info);
-}
+.btn-success { background-color: #28a745; }
+.btn-warning { background-color: #ffc107; color: var(--dark); }
+.btn-info { background-color: #17a2b8; }
 
 .btn-outline {
-  /* TODO: Add outline button styles */
-  /* HINT: Transparent background with border and specific text color */
-  background-color: transparent;
-  box-shadow: inset 0 0 0 2px var(--primary);
-  border-radius:var(--btn-border-radius);
-  color: var(--primary);
+    background-color: transparent;
+    border: 2px solid var(--primary);
+    color: var(--primary);
 }
 
 .btn-outline:hover {
-  /* TODO: Add hover styles for outline button */
-  /* HINT: Change background-color and text color */
-  background-color: var(--primary);
-  color: var(--white);
+    background-color: var(--primary);
+    color: var(--white);
 }
 
 .btn-group {
-  /* TODO: Add button group styles */
-  /* HINT: Use display and gap */
-  display: flex;
-  gap: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
-/* Chip Styles */
+.btn .material-icons {
+    font-size: 20px;
+}
+
+/* Chips */
 .chips-container {
-  /* TODO: Add chips container styles */
-  /* HINT: Use display, flex-wrap, gap, and margin */
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 10px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 0;
 }
 
 .chip {
-  /* TODO: Add chip styles */
-  /* HINT: Use display, align-items, padding, background-color, border-radius, font-size, color, and cursor */
-  display: inline-flex;
-  align-items: center;
-  padding: 5px 10px;
-  background-color: var(--light-gray);
-  border-radius: 20px;
-  font-size: 0.9rem;
-  color: var(--dark);
-  cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--light-gray);
+    color: var(--text-color);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.chip:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .chip.active {
-  /* TODO: Add active chip styles */
-  /* HINT: Change background-color and color */
-  background-color: var(--primary);
-  color: var(--white);
+    background-color: var(--primary);
+    color: var(--white);
 }
 
-.chip i {
-  /* TODO: Add icon styles within chips */
-  /* HINT: Use margin-right */
-  margin-right: 5px;
+.chip .material-icons {
+    font-size: 18px;
 }
 
 .chip .close {
-  /* TODO: Add close button styles within chips */
-  /* HINT: Use margin-left, cursor, and font-weight */
-  margin-left: 8px;
-  cursor: pointer;
-  font-weight: bold;
+    font-size: 20px;
+    font-weight: bold;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
 }
 
-/* Slider Styles */
+.chip .close:hover {
+    opacity: 1;
+}
+
+/* Slider */
 .slider-container {
-  /* TODO: Add slider container styles */
-  /* HINT: Use margin */
-  margin: 20px 0;
+    margin-bottom: 24px;
+}
+
+.slider-container label {
+    font-weight: 500;
+    margin-right: 10px;
+    display: inline-block;
+    margin-bottom: 10px;
 }
 
 .slider {
-  /* TODO: Add slider styles */
-  /* HINT: Use appearance, width, height, border-radius, background, and outline */
-  appearance: none;
-  width: 100%;
-  height: 8px;
-  border-radius: 5px;
-  background: var(--light-gray);
-  outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    background: var(--light-gray);
+    border-radius: 5px;
+    outline: none;
 }
 
 .slider::-webkit-slider-thumb {
-  /* TODO: Add slider thumb styles */
-  /* HINT: Use appearance, width, height, border-radius, background, cursor, and transition */
-  -webkit-appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--primary);
-  cursor: pointer;
-  transition: var(--transition);
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--primary);
+    cursor: pointer;
+    border-radius: 50%;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease;
 }
-
 .slider::-webkit-slider-thumb:hover {
-  /* TODO: Add hover styles for slider thumb */
-  /* HINT: Use background and transform */
-  background: var(--secondary);
-  transform: scale(1.1);
+    transform: scale(1.1);
 }
 
 .slider-value {
-  /* TODO: Add slider value styles */
-  /* HINT: Use text-align, font-weight, and color */
-  text-align: center;
-  font-weight: 600;
-  color: var(--dark);
-  margin-top: 10px;
+    margin-top: 8px;
+    font-weight: 600;
+    color: var(--primary);
 }
 
-/* Switch Styles */
+/* Switch */
 .switch-container {
-  /* TODO: Add switch container styles */
-  /* HINT: Use display, align-items, and margin */
-  display: flex;
-  align-items: center;
-  margin: 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 16px 0;
 }
 
 .switch {
-  /* TODO: Add switch styles */
-  /* HINT: Use position, display, width, height, and margin-right */
-  position: relative;
-  display: inline-block;
-  width: 50px;
-  height: 24px;
-  margin-right: 10px;
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
 }
 
-.switch input {
-  /* TODO: Add switch input styles */
-  /* HINT: Use opacity, width, and height */
-  opacity: 0;
-  width: 0;
-  height: 0;
+.switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
 }
 
 .slider-round {
-  /* TODO: Add slider round styles */
-  /* HINT: Use position, cursor, top/left/right/bottom properties, background-color, transition, and border-radius */
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--light-gray);
-  transition: var(--transition);
-  border-radius: 34px;
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--gray);
+    transition: .4s;
+    border-radius: 28px;
 }
 
 .slider-round:before {
-  /* TODO: Add slider round before element styles */
-  /* HINT: Use position, content, height, width, left, bottom, background-color, transition, and border-radius */
-  position: absolute;
-  content: "";
-  height: 18px;
-  width: 18px;
-  left: 3px;
-  bottom: 3px;
-  background-color: var(--white);
-  transition: var(--transition);
-  border-radius: 50%;
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
 input:checked + .slider-round {
-  /* TODO: Add checked slider round styles */
-  /* HINT: Change background-color */
-  background-color: var(--primary);
+    background-color: var(--primary);
+}
+
+input:focus-visible + .slider-round {
+    box-shadow: 0 0 0 2px var(--body-bg), 0 0 0 4px var(--primary);
 }
 
 input:checked + .slider-round:before {
-  /* TODO: Add checked slider round before element styles */
-  /* HINT: Use transform with translateX */
-  transform: translateX(26px);
+    transform: translateX(22px);
 }
 
-/* List Styles */
+/* Lists */
 .list {
-  /* TODO: Add list styles */
-  /* HINT: Use list-style-type, background-color, border-radius, overflow, and box-shadow */
-  list-style-type: none;
-  background-color: var(--card-bg);
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: var(--box-shadow);
+    list-style: none;
+    padding: 8px 0;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 .list-item {
-  /* TODO: Add list item styles */
-  /* HINT: Use padding, border-bottom, display, align-items, cursor, and transition */
-  padding: 15px 20px;
-  border-bottom: 1px solid var(--border-color);
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.list-item:last-child {
-  /* TODO: Add styles for last list item */
-  /* HINT: Remove border-bottom */
-  border-bottom: none;
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    gap: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 .list-item:hover {
-  /* TODO: Add hover styles for list items */
-  /* HINT: Change background-color */
-  background-color: var(--light-gray);
+    background-color: rgba(67, 97, 238, 0.05);
 }
 
-.list-item i {
-  /* TODO: Add icon styles in list items */
-  /* HINT: Use margin-right and color */
-  margin-right: 15px;
-  color: var(--primary);
+.list-item .material-icons {
+    color: var(--primary);
 }
 
-.list-item .avatar {
-  /* TODO: Add avatar styles in list items */
-  /* HINT: Use width, height, border-radius, margin-right, and object-fit */
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 15px;
-  object-fit: cover;
+.list-item .badge {
+    margin-left: auto;
 }
 
-/* Form Styles */
+/* Forms */
 .form-group {
-  /* TODO: Add form group styles */
-  /* HINT: Add margin-bottom */
-  margin-bottom: 15px;
+    margin-bottom: 24px;
 }
 
 .form-label {
-  /* TODO: Add form label styles */
-  /* HINT: Use display, margin, and font-weight */
-  display: block;
-  margin-bottom: 5px;
-  font-weight: 600;
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-color);
 }
 
-.form-input {
-  /* TODO: Add form input styles */
-  /* HINT: Use width, padding, border, border-radius, font-size, transition */
-  width: 100%;
-  padding: 10px;
-  border: 1px solid var(--border-color);
-  border-radius: 5px;
-  font-size: 1rem;
-  transition: var(--transition);
+.form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    font-size: 16px;
+    font-family: 'Poppins', sans-serif;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.form-input:focus {
-  /* TODO: Add focus styles for form inputs */
-  /* HINT: Use outline, border-color, and box-shadow */
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 5px rgba(67, 97, 238, 0.5);
-}
-
-.form-select {
-  /* TODO: Add form select styles */
-  /* HINT: Similar to form-input, with additional background-color */
-  width: 100%;
-  padding: 10px;
-  border: 1px solid var(--border-color);
-  border-radius: 5px;
-  font-size: 1rem;
-  transition: var(--transition);
-  background-color: var(--white);
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
 }
 
 .form-textarea {
-  /* TODO: Add textarea styles */
-  /* HINT: Similar to form-input, with additional min-height and resize properties */
-  width: 100%;
-  padding: 10px;
-  border: 1px solid var(--border-color);
-  border-radius: 5px;
-  font-size: 1rem;
-  transition: var(--transition);
-  min-height: 100px;
-  resize: vertical;
+    resize: vertical;
+    min-height: 120px;
 }
 
-/* Table Styles */
+/* Tables */
 .table-container {
-  /* TODO: Add table container styles */
-  /* HINT: Use overflow-x and margin */
-  overflow-x: auto;
-  margin: 20px 0;
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
 }
 
 .table {
-  /* TODO: Add table styles */
-  /* HINT: Use width, border-collapse, border-spacing */
-  width: 100%;
-  border-collapse: collapse;
-  border-spacing: 0;
+    width: 100%;
+    border-collapse: collapse;
 }
 
-.table th,
-.table td {
-  /* TODO: Add table cell styles */
-  /* HINT: Use padding, text-align, border-bottom */
-  padding: 12px 15px;
-  text-align: left;
-  border-bottom: 1px solid var(--border-color);
+.table th, .table td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
 }
 
-.table th {
-  /* TODO: Add table header styles */
-  /* HINT: Use background-color, font-weight, cursor */
-  background-color: var(--light-gray);
-  font-weight: 600;
-  cursor: pointer;
+.table thead th {
+    background-color: var(--light-gray);
+    font-weight: 600;
+    color: var(--text-color);
+    cursor: pointer;
 }
 
-.table th:hover {
-  /* TODO: Add hover styles for table headers */
-  /* HINT: Change background-color */
-  background-color: var(--primary);
-  color: var(--white);
+.table tbody tr:hover {
+    background-color: var(--light-gray);
 }
 
-.table tr {
-  /* TODO: Add table row styles */
-  /* HINT: Use transition */
-  transition: var(--transition);
+.table tbody tr:last-child td {
+    border-bottom: none;
 }
 
-.table tr:hover {
-  /* TODO: Add hover styles for table rows */
-  /* HINT: Change background-color with rgba for transparency */
-  background-color: rgba(67, 97, 238, 0.1);
+.table td .btn {
+    padding: 6px 12px;
+    font-size: 14px;
 }
 
-/* Badge Styles */
+/* Badges */
 .badge {
-  /* TODO: Add badge styles */
-  /* HINT: Use display, padding, border-radius, font-size, font-weight, and margin-left */
-  display: inline-block;
-  padding: 5px 10px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  margin-left: 5px;
+    display: inline-block;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 12px;
+    color: var(--white);
+    line-height: 1.5;
 }
 
-.badge-primary {
-  /* TODO: Add primary badge styles */
-  /* HINT: Use background-color and color */
-  background-color: var(--primary);
-  color: var(--white);
-}
+.badge-primary { background-color: var(--primary); }
+.badge-success { background-color: #28a745; }
+.badge-warning { background-color: #ffc107; color: var(--dark); }
 
-.badge-success {
-  /* TODO: Add success badge styles */
-  /* HINT: Use background-color and color */
-  background-color: var(--success);
-  color: var(--white);
-}
 
-.badge-warning {
-  /* TODO: Add warning badge styles */
-  /* HINT: Use background-color and color */
-  background-color: var(--warning);
-  color: var(--white);
-}
-
-/* Alert Styles */
+/* Alerts */
 .alert {
-  /* TODO: Add alert styles */
-  /* HINT: Use padding, border-radius, margin-bottom, display, align-items, and justify-content */
-  padding: 15px 20px;
-  border-radius: 5px;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.alert i {
-  /* TODO: Add icon styles in alerts */
-  /* HINT: Use margin-right and font-size */
-  margin-right: 10px;
-  font-size: 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border-left: 5px solid;
 }
 
 .alert-content {
-  /* TODO: Add alert content styles */
-  /* HINT: Use display and align-items */
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.alert .material-icons {
+    font-size: 24px;
 }
 
 .alert-close {
-  /* TODO: Add alert close button styles */
-  /* HINT: Use cursor and font-weight */
-  cursor: pointer;
-  font-weight: bold;
+    font-size: 24px;
+    cursor: pointer;
+    font-weight: bold;
+    background: none;
+    border: none;
+    color: inherit;
+    opacity: 0.7;
+}
+.alert-close:hover {
+    opacity: 1;
 }
 
-.alert-success {
-  /* TODO: Add success alert styles */
-  /* HINT: Use background-color, color, and border-left */
-  background-color: #d4edda;
-  color: #155724;
-  border-left: 5px solid #28a745;
-}
+.alert-success { background-color: #d4edda; border-color: #28a745; color: #155724; }
+.alert-warning { background-color: #fff3cd; border-color: #ffc107; color: #856404; }
+.alert-info { background-color: #d1ecf1; border-color: #17a2b8; color: #0c5460; }
 
-.alert-warning {
-  /* TODO: Add warning alert styles */
-  /* HINT: Use background-color, color, and border-left */
-  background-color: #fff3cd;
-  color: #856404;
-  border-left: 5px solid #ffc107;
-}
-
-.alert-info {
-  /* TODO: Add info alert styles */
-  /* HINT: Use background-color, color, and border-left */
-  background-color: #d1ecf1;
-  color: #0c5460;
-  border-left: 5px solid #17a2b8;
-}
-
-/* Navigation Styles */
+/* Navigation */
 .nav {
-  /* TODO: Add navigation styles */
-  /* HINT: Use display, background-color, border-radius, overflow, and margin-bottom */
-  display: flex;
-  background-color: var(--light-gray);
-  border-radius: 5px;
-  overflow: hidden;
-  margin-bottom: 20px;
+    display: flex;
+    gap: 8px;
+    background-color: var(--light-gray);
+    padding: 8px;
+    border-radius: 10px;
+    margin-bottom: 30px;
 }
 
 .nav-item {
-  /* TODO: Add navigation item styles */
-  /* HINT: Use padding, color, text-decoration, transition */
-  padding: 10px 15px;
-  color: var(--dark);
-  text-decoration: none;
-  transition: var(--transition);
+    padding: 10px 20px;
+    text-decoration: none;
+    color: var(--gray);
+    border-radius: 8px;
+    font-weight: 500;
+    transition: var(--transition);
 }
 
 .nav-item:hover {
-  /* TODO: Add hover styles for nav items */
-  /* HINT: Change background-color */
-  background-color: var(--primary);
+    background-color: rgba(0,0,0,0.05);
+    color: var(--text-color);
 }
 
 .nav-item.active {
-  /* TODO: Add styles for active nav item */
-  /* HINT: Use background-color and font-weight */
-  background-color: var(--primary);
-  font-weight: bold;
+    background-color: var(--primary);
+    color: var(--white);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-/* Progress Bar Styles */
+/* Progress Bar */
 .progress {
-  /* TODO: Add progress bar container styles */
-  /* HINT: Use height, background-color, border-radius, margin, and overflow */
-  height: 20px;
-  background-color: var(--light-gray);
-  border-radius: 5px;
-  margin: 10px 0;
-  overflow: hidden;
+    height: 12px;
+    background-color: var(--light-gray);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 16px 0 8px 0;
 }
 
 .progress-bar {
-  /* TODO: Add progress bar styles */
-  /* HINT: Use height, border-radius, and transition */
-  height: 100%;
-  border-radius: 5px;
-  transition: width 600ms cubic-bezier(.4,0,.2,1);
+    height: 100%;
+    background-color: var(--primary);
+    transition: width 0.5s ease-in-out;
+    border-radius: 12px;
 }
+.progress-success { background-color: #28a745; }
 
-.progress-primary {
-  /* TODO: Add primary progress bar styles */
-  /* HINT: Use background-color */
-  background-color: var(--primary);
-}
-
-.progress-success {
-  /* TODO: Add success progress bar styles */
-  /* HINT: Use background-color */
-  background-color: var(--success);
-}
-
-/* Pagination Styles */
+/* Pagination */
 .pagination {
-  /* TODO: Add pagination styles */
-  /* HINT: Use display, list-style, padding, and margin */
-  display: flex;
-  list-style: none;
-  padding: 0;
-  margin: 20px 0;
-  justify-content: center;
+    display: flex;
+    list-style: none;
+    padding: 0;
+    gap: 8px;
+    justify-content: center;
 }
 
-.page-item {
-  /* TODO: Add page item styles */
-  /* HINT: Use margin-right */
-  margin-right: 5px;
+.page-item .page-link {
+    display: block;
+    padding: 10px 16px;
+    color: var(--primary);
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    text-decoration: none;
+    transition: var(--transition);
+    cursor: pointer;
 }
 
-.page-link {
-  /* TODO: Add page link styles */
-  /* HINT: Use display, padding, border, border-radius, color, text-decoration, transition, and cursor */
-  display: block;
-  padding: 10px 15px;
-  border: 1px solid transparent;
-  border-radius: 5px;
-  color: var(--dark);
-  text-decoration: none;
-  transition: background-color 0.2s;
-  cursor: pointer;
-}
-
-.page-link:hover {
-  /* TODO: Add hover styles for page links */
-  /* HINT: Change background-color */
-  background-color: var(--light-gray);
+.page-item .page-link:hover {
+    background-color: var(--light-gray);
+    border-color: var(--primary);
 }
 
 .page-item.active .page-link {
-  /* TODO: Add styles for active page link */
-  /* HINT: Use background-color, color, and border-color */
-  background-color: var(--primary);
-  color: #fff;
-  border-color: var(--primary);
+    background-color: var(--primary);
+    color: var(--white);
+    border-color: var(--primary);
 }
 
-/* Breadcrumb Styles */
+/* Breadcrumbs */
 .breadcrumb {
-  /* TODO: Add breadcrumb styles */
-  /* HINT: Use display, list-style, padding, and margin */
-  display: flex;
-  list-style: none;
-  padding: 0;
-  margin: 20px 0;
+    display: flex;
+    list-style: none;
+    padding: 10px 0;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
 .breadcrumb-item {
-  /* TODO: Add breadcrumb item styles */
-  /* HINT: Use display and align-items */
-  display: flex;
-  align-items: center;
-}
-
-.breadcrumb-item:not(:last-child)::after {
-  /* TODO: Add separator for breadcrumb items */
-  /* HINT: Use content, margin, and color */
-  content: ">";
-  margin: 0 5px;
-  color: var(--dark);
+    color: var(--gray);
+    font-size: 14px;
 }
 
 .breadcrumb-link {
-  /* TODO: Add breadcrumb link styles */
-  /* HINT: Use color, text-decoration, and cursor */
-  color: var(--primary);
-  text-decoration: none;
-  cursor: pointer;
+    color: var(--primary);
+    text-decoration: none;
+    cursor: pointer;
 }
 
 .breadcrumb-link:hover {
-  /* TODO: Add hover styles for breadcrumb links */
-  /* HINT: Add text-decoration */
-  text-decoration: underline;
+    text-decoration: underline;
 }
 
 .breadcrumb-item.active {
-  /* TODO: Add styles for active breadcrumb item */
-  /* HINT: Use color */
-  color: var(--primary);
+    font-weight: 500;
+    color: var(--text-color);
 }
 
-/* Modal Styles */
-.modal {
-  /* TODO: Add modal styles */
-  /* HINT: Use display, position, top/left, width, height, background-color, z-index, justify-content, and align-items */
-  display: none; /* Hidden by default */
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1050;
-  justify-content: center;
-  align-items: center;
+.breadcrumb-item + .breadcrumb-item::before {
+    content: '/';
+    margin-right: 8px;
+    color: var(--gray);
 }
 
-.modal-content {
-  /* TODO: Add modal content styles */
-  /* HINT: Use background-color, border-radius, width, max-width, padding, and box-shadow */
-  background-color: var(--card-bg);
-  border-radius: 5px;
-  width: 100%;
-  max-width: 500px;
-  padding: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.modal-header {
-  /* TODO: Add modal header styles */
-  /* HINT: Use display, justify-content, align-items, and margin-bottom */
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.modal-title {
-  /* TODO: Add modal title styles */
-  /* HINT: Use font-size and color */
-  font-size: 1.25rem;
-  color: var(--dark);
-}
-
-.modal-close {
-  /* TODO: Add modal close button styles */
-  /* HINT: Use background, border, font-size, cursor, and color */
-  background: none;
-  border: none;
-  font-size: 1.25rem;
-  cursor: pointer;
-  color: var(--dark);
-}
-
-/* Tooltip Styles */
+/* Tooltip */
 .tooltip {
-  /* TODO: Add tooltip styles */
-  /* HINT: Use position, display, border-bottom, and cursor */
-  position: relative;
-  display: inline-block;
-  border-bottom: 1px dotted var(--dark);
-  cursor: help;
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted var(--text-color);
 }
 
 .tooltip .tooltip-text {
-  /* TODO: Add tooltip text styles */
-  /* HINT: Use visibility, width, background-color, color, text-align, border-radius, padding, position, z-index, bottom, left, margin-left, opacity, and transition */
-  visibility: hidden;
-  width: 120px;
-  background-color: var(--dark);
-  color: #fff;
-  text-align: center;
-  border-radius: 5px;
-  padding: 5px 10px;
-  position: absolute;
-  z-index: 1000;
-  bottom: 100%;
-  left: 50%;
-  margin-left: -60px;
-  opacity: 0;
-  transition: opacity 0.2s;
+    visibility: hidden;
+    width: 160px;
+    background-color: var(--dark);
+    color: var(--light);
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -80px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 .tooltip .tooltip-text::after {
-  /* TODO: Add tooltip arrow styles */
-  /* HINT: Use content, position, top, left, margin-left, border-width, border-style, and border-color */
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  margin-left: -5px;
-  border-width: 5px;
-  border-style: solid;
-  border-color: var(--dark) transparent transparent transparent;
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--dark) transparent transparent transparent;
 }
 
 .tooltip:hover .tooltip-text {
-  /* TODO: Add hover styles for tooltip */
-  /* HINT: Change visibility and opacity */
-  visibility: visible;
-  opacity: 1;
+    visibility: visible;
+    opacity: 1;
 }
 
-/* Accordion Styles */
-.accordion {
-  /* TODO: Add accordion styles */
-  /* HINT: Use margin */
-  margin: 20px 0;
-}
-
+/* Accordion */
 .accordion-item {
-  /* TODO: Add accordion item styles */
-  /* HINT: Use border, border-radius, margin-bottom, and overflow */
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  margin-bottom: 10px;
-  overflow: hidden;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: margin 0.3s ease;
+}
+.accordion-item:last-child {
+    margin-bottom: 0;
 }
 
 .accordion-header {
-  /* TODO: Add accordion header styles */
-  /* HINT: Use padding, background-color, cursor, display, justify-content, align-items, and font-weight */
-  padding: 12px 16px;
-  background-color: var(--light);
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background-color: var(--card-bg);
+    cursor: pointer;
+    font-weight: 600;
+}
+.accordion-header.active {
+    color: var(--primary);
+}
+
+.accordion-header .material-icons {
+    transition: transform 0.3s ease;
+}
+.accordion-header.active .material-icons {
+    transform: rotate(180deg);
 }
 
 .accordion-content {
-  /* TODO: Add accordion content styles */
-  /* HINT: Use padding, max-height, overflow, and transition */
-  padding: 0 16px;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+    padding: 0 16px;
+    background-color: var(--card-bg);
 }
 
 .accordion-content.active {
-  /* TODO: Add styles for active accordion content */
-  /* HINT: Use padding and max-height */
-  padding: 12px 16px;
-  max-height: 200px; /* Adjust based on content */
+    max-height: 200px;
+    padding: 16px;
+    border-top: 1px solid var(--border-color);
 }
 
-/* Tabs Styles */
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+.modal-content {
+    background-color: var(--card-bg);
+    padding: 24px;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+}
+
+.modal-title {
+    margin: 0;
+    font-size: 20px;
+}
+
+.modal-close {
+    color: var(--gray);
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+.modal-close:hover,
+.modal-close:focus {
+    color: var(--text-color);
+}
+
+/* Tabs */
 .tabs {
-  /* TODO: Add tabs container styles */
-  /* HINT: Use margin */
-  margin: 20px 0;
+    margin: 18px 0;
 }
-
 .tab-header {
-  /* TODO: Add tab header styles */
-  /* HINT: Use display and border-bottom */
-  display: flex;
-  border-bottom: 1px solid var(--border);
+    display: flex;
+    border-bottom: 2px solid var(--border-color);
+    gap: 16px;
 }
 
 .tab-link {
-  /* TODO: Add tab link styles */
-  /* HINT: Use padding, cursor, transition, and border-bottom */
-  padding: 12px 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  border-bottom: 2px solid transparent;
+    padding: 12px 0px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    color: var(--gray);
+    font-weight: 500;
+    transition: all 0.2s ease;
 }
 
 .tab-link:hover {
-  /* TODO: Add hover styles for tab links */
-  /* HINT: Change color */
-  color: var(--primary);
+    color: var(--primary);
 }
 
 .tab-link.active {
-  /* TODO: Add styles for active tab link */
-  /* HINT: Use color and border-bottom */
-  color: var(--primary);
-  border-bottom: 2px solid var(--primary);
+    border-color: var(--primary);
+    color: var(--primary);
+    font-weight: 600;
 }
 
 .tab-content {
-  /* TODO: Add tab content styles */
-  /* HINT: Use padding */
-  padding: 12px 16px;
+    padding-top: 24px;
 }
 
-.tab-pane {
-  /* TODO: Add tab pane styles */
-  /* HINT: Use display property */
-  display: none;
-}
+@keyframes tabFadeIn { from { opacity: 0; } to { opacity: 1; } }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; animation: tabFadeIn 0.5s; }
 
-.tab-pane.active {
-  /* TODO: Add styles for active tab pane */
-  /* HINT: Change display */
-  display: block;
-}
-
-/* Dropdown Styles */
+/* Dropdown */
 .dropdown {
-  /* TODO: Add dropdown styles */
-  /* HINT: Use position and display */
-  position: relative;
-  display: inline-block;
+    position: relative;
+    display: inline-block;
 }
 
 .dropdown-toggle {
-  /* TODO: Add dropdown toggle styles */
-  /* HINT: Use padding, background-color, color, border, border-radius, cursor, display, and align-items */
-  padding: 10px 15px;
-  background-color: var(--primary);
-  color: var(--white);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    background-color: var(--primary);
+    color: var(--white);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
 }
 
-.dropdown-toggle::after {
-  /* TODO: Add dropdown toggle indicator */
-  /* HINT: Use content, margin-left, and font-size */
-  content: '';
-  margin-left: 5px;
-  font-size: 12px;
+.dropdown-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    opacity: 0.9;
 }
 
 .dropdown-menu {
-  /* TODO: Add dropdown menu styles */
-  /* HINT: Use position, top, left, background-color, border-radius, box-shadow, min-width, z-index, and display */
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background-color: var(--white);
-  border-radius: 5px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  min-width: 160px;
-  z-index: 1000;
-  display: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px) scale(0.95);
+    transform-origin: top;
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    position: absolute;
+    background-color: var(--card-bg);
+    min-width: 180px;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+    z-index: 10;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    padding: 8px 0;
+    margin-top: 8px;
 }
 
 .dropdown-menu.show {
-  /* TODO: Add styles for visible dropdown menu */
-  /* HINT: Change display */
-  display: block;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
 }
 
 .dropdown-item {
-  /* TODO: Add dropdown item styles */
-  /* HINT: Use padding, display, color, text-decoration, and transition */
-  padding: 12px 16px;
-  display: block;
-  color: var(--text);
-  text-decoration: none;
-  transition: background-color 0.3s;
+    color: var(--text-color);
+    padding: 10px 16px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
 }
 
 .dropdown-item:hover {
-  /* TODO: Add hover styles for dropdown items */
-  /* HINT: Change background-color */
-  background-color: var(--primary);
+    background-color: var(--light-gray);
 }
 
-/* Toast Styles */
+/* Toasts */
 .toast-container {
-  /* TODO: Add toast container styles */
-  /* HINT: Use position, bottom, right, and z-index */
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 1100;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .toast {
-  /* TODO: Add toast styles */
-  /* HINT: Use padding, background-color, border-radius, box-shadow, margin-bottom, display, align-items, justify-content, min-width, transform, opacity, and transition */
-  padding: 12px 16px;
-  background-color: var(--white);
-  border-radius: 5px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-width: 300px;
-  transform: translateY(100%);
-  opacity: 0;
-  transition: transform 0.3s ease, opacity 0.3s ease;
+    min-width: 300px;
+    background-color: var(--card-bg);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    border: 1px solid var(--border-color);
 }
 
 .toast.show {
-  /* TODO: Add styles for visible toast */
-  /* HINT: Use transform and opacity */
-  transform: translateY(0);
-  opacity: 1;
+    opacity: 1;
+    transform: translateX(0);
 }
 
-.toast-success {
-  /* TODO: Add success toast styles */
-  /* HINT: Use border-left */
-  border-left: 4px solid var(--success);
-}
-
-.toast-warning {
-  /* TODO: Add warning toast styles */
-  /* HINT: Use border-left */
-  border-left: 4px solid var(--warning);
-}
+.toast-success { border-left: 4px solid #28a745; }
+.toast-warning { border-left: 4px solid #ffc107; }
+.toast-info { border-left: 4px solid #17a2b8; }
 
 .toast-close {
-  /* TODO: Add toast close button styles */
-  /* HINT: Use cursor and font-weight */
-  cursor: pointer;
-  font-weight: bold;
-}
-
-/* Code Editor Styles */
-.code-editor {
-  /* TODO: Add code editor styles */
-  /* HINT: Use background-color, border-radius, padding, margin, font-family, color, and overflow-x */
-  background-color: var(--background);
-  border-radius: 5px;
-  padding: 12px;
-  margin: 12px 0;
-  font-family: 'Courier New', Courier, monospace;
-  color: var(--text);
-  overflow-x: auto;
-}
-
-.code-comment {
-  /* TODO: Add code comment styles */
-  /* HINT: Use color */
-  color: var(--comment);
-}
-
-.code-selector {
-  /* TODO: Add code selector styles */
-  /* HINT: Use color */
-  color: var(--selector);
-}
-
-.code-property {
-  /* TODO: Add code property styles */
-  /* HINT: Use color */
-  color: var(--property);
-}
-
-.code-value {
-  /* TODO: Add code value styles */
-  /* HINT: Use color */
-  color: var(--value);
-}
-
-/* Theme Selector */
-.theme-selector {
-  /* TODO: Add theme selector styles */
-  /* HINT: Use position, top, right, and z-index */
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 1200;
-}
-
-.theme-btn {
-  /* TODO: Add theme button styles */
-  /* HINT: Use padding, background-color, color, border, border-radius, and cursor */
-  padding: 8px 12px;
-  background-color: var(--primary);
-  color: var(--white);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-/* Animation Classes */
-.fade-in {
-  /* TODO: Add fade-in animation */
-  /* HINT: Use animation property */
-  animation: fadeIn 0.5s ease-in-out;
-}
-
-.slide-in {
-  /* TODO: Add slide-in animation */
-  /* HINT: Use animation property */
-  animation: slideIn 0.5s ease-in-out;
-}
-
-.bounce {
-  /* TODO: Add bounce animation */
-  /* HINT: Use animation property */
-  animation: bounce 0.5s ease;
-}
-
-@keyframes fadeIn {
-  /* TODO: Add fadeIn keyframes */
-  /* HINT: Define from and to states with opacity */
-  from {
-    opacity: 0;
-  }
-}
-
-@keyframes slideIn {
-  /* TODO: Add slideIn keyframes */
-  /* HINT: Define from and to states with transform and opacity */
-  from {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes bounce {
-  /* TODO: Add bounce keyframes */
-  /* HINT: Define keyframe percentages with transform */
-  0%, 100% {
-    transform: translateY(0);
-  }
-}
-
-/* Panel Header with close button */
-.panel-header {
-  /* TODO: Add panel header styles */
-  /* HINT: Use display, justify-content, align-items, margin-bottom, border-bottom, and padding-bottom */
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 10px;
-}
-
-.panel-close {
-  /* TODO: Add panel close button styles */
-  /* HINT: Use background, border, font-size, cursor, color, and transition */
-  background: none;
-  border: none;
-  font-size: 1rem;
-  cursor: pointer;
-  color: var(--text);
-  transition: color 0.3s ease;
-}
-
-.panel-close:hover {
-  /* TODO: Add hover styles for panel close button */
-  /* HINT: Use color and transform */
-  color: var(--primary);
-  transform: scale(1.1);
-}
-
-/* Pull tab that appears on the left edge when panel is closed */
-.panel-pull-tab {
-  /* TODO: Add panel pull tab styles */
-  /* HINT: Use position, top, left, transform, background-color, color, padding, border-radius, cursor, box-shadow, z-index, display, align-items, justify-content, and transition */
-  position: fixed;
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
-  background-color: var(--light-gray);
-  color: var(--text);
-  padding: 8px 12px;
-  border-radius: 5px;
-  cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.3s ease;
-}
-
-.panel-pull-tab:hover {
-  /* TODO: Add hover styles for panel pull tab */
-  /* HINT: Use padding-right and background-color */
-  padding-right: 16px;
-  background-color: var(--dark-gray);
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    background: none;
+    border: none;
+    color: var(--gray);
 }
 
 /* Customization Panel */
+.panel-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+    height: auto;
+    width: auto;
+    padding: 12px 24px;
+    border-radius: 50px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    background-color: var(--primary);
+    color: var(--white);
+    font-weight: 600;
+    border: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+
+.panel-toggle:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+}
+
 .customization-panel {
-  /* TODO: Add customization panel styles */
-  /* HINT: Use position, top, left, width, height, background-color, box-shadow, padding, overflow-y, transform, transition, and z-index */
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 300px;
-  height: 100%;
-  background-color: var(--white);
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-  padding: 20px;
-  overflow-y: auto;
-  transform: translateX(-100%);
-  transition: transform 0.3s ease;
-  z-index: 1100;
+    position: fixed;
+    top: 0;
+    right: -350px; /* Hidden off-screen */
+    width: 350px;
+    height: 100%;
+    background: var(--card-bg);
+    box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+    padding: 24px;
+    z-index: 1002;
+    transition: right 0.4s ease-in-out;
+    overflow-y: auto;
+    border-left: 1px solid var(--border-color);
 }
 
 .customization-panel.open {
-  /* TODO: Add styles for open customization panel */
-  /* HINT: Use transform */
-  transform: translateX(0);
+    right: 0;
 }
 
-.panel-toggle {
-  /* TODO: Add panel toggle styles */
-  /* HINT: Use position, top, right, z-index, padding, background-color, color, border, border-radius, and cursor */
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 1200;
-  padding: 10px 15px;
-  background-color: var(--primary);
-  color: var(--white);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.panel-header h3 { margin: 0; }
+
+.panel-close {
+    font-size: 28px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--gray);
+}
+.panel-close:hover {
+    color: var(--text-color);
 }
 
 .color-option {
-  /* TODO: Add color option styles */
-  /* HINT: Use width, height, border-radius, display, margin, cursor, and border */
-  width: 30px;
-  height: 30px;
-  border-radius: 5px;
-  display: inline-block;
-  margin-right: 5px;
-  cursor: pointer;
-  border: 2px solid transparent;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-right: 10px;
+    border: 3px solid transparent;
+    transition: all 0.3s;
 }
 
-.color-option.active {
-  /* TODO: Add active color option styles */
-  /* HINT: Use border-color */
-  border-color: var(--primary);
+.color-option.active, .color-option:hover {
+    border-color: var(--primary);
+    transform: scale(1.1);
 }
 
 /* Interactive Widgets */
 .interactive-widgets {
-  /* TODO: Add interactive widgets container styles */
-  /* HINT: Use display, grid-template-columns, gap, and margin-bottom */
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 15px;
-  margin-bottom: 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
 }
 
 .widget {
-  /* TODO: Add widget styles */
-  /* HINT: Use background-color, border-radius, box-shadow, padding, display, and transition */
-  background-color: var(--white);
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  transition: box-shadow 0.3s ease;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-.widget:hover {
-  /* TODO: Add hover styles for widgets */
-  /* HINT: Use transform and box-shadow */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  transform: translateY(-5px);
-}
-
-.widget i {
-  /* TODO: Add widget icon styles */
-  /* HINT: Use font-size, color, and margin-right */
-  font-size: 1.5rem;
-  color: var(--primary);
-  margin-right: 10px;
-}
-
-.widget-content {
-  /* TODO: Add widget content styles */
-  /* HINT: Use flex property */
-  flex: 1;
+.widget .material-icons {
+    color: var(--primary);
+    font-size: 28px;
 }
 
 .widget h3 {
-  /* TODO: Add widget heading styles */
-  /* HINT: Use margin-top, margin-bottom, color, and font-size */
-  margin-top: 0;
-  margin-bottom: 10px;
-  color: var(--text);
-  font-size: 1.2rem;
+    margin: 0;
+    font-size: 16px;
 }
+
+/* Code editor */
+.code-editor {
+    background-color: #2d3436;
+    color: #dfe6e9;
+    font-family: 'Courier New', Courier, monospace;
+    padding: 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    overflow-x: auto;
+    white-space: normal;
+}
+.dark-theme .code-editor {
+    background-color: #1a202c;
+}
+
+.code-comment { color: #636e72; }
+.code-selector { color: #0984e3; }
+.code-property { color: #d63031; }
+.code-value { color: #00b894; }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  /* TODO: Add responsive styles for mobile */
-  /* HINT: Adjust component-grid, btn-group, nav, and tab-header */
+    body {
+        padding: 10px;
+    }
+    .container {
+        padding: 10px;
+    }
 
-  .component-grid {
-    /* Change grid to single column */
-    grid-template-columns: 1fr;
-  }
+    header h1 {
+        font-size: 2rem;
+    }
 
-  .btn-group {
-    /* Stack buttons vertically */
-    flex-direction: column;
-  }
+    .nav {
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
 
-  .nav {
-    /* Make nav items stack vertically */
-    flex-direction: column;
-  }
-
-  .tab-header {
-    /* Make tab links stack vertically */
-    flex-direction: column;
-  }
+    .customization-panel {
+        width: 300px;
+        right: -300px;
+    }
 }
-
 /* ========== PRESERVED WIDGET STYLES ========== */
 
 /* Clock Widget */
@@ -1441,6 +1084,7 @@ input:checked + .slider-round:before {
   border-radius: 5px;
   overflow: hidden;
   width: fit-content;
+  border: 1px solid var(--border-color);
 }
 
 .clock-toggle-btn {
@@ -1450,6 +1094,7 @@ input:checked + .slider-round:before {
   cursor: pointer;
   transition: var(--transition);
   font-size: 0.8rem;
+  color: var(--text-color);
 }
 
 .clock-toggle-btn.active {
@@ -1484,6 +1129,7 @@ input:checked + .slider-round:before {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 5px;
+  text-align: center;
 }
 
 .calendar-day {
@@ -1504,13 +1150,14 @@ input:checked + .slider-round:before {
 
 .calendar-day.day-name {
   font-weight: bold;
-  color: var(--dark);
+  color: var(--text-color);
+  font-size: 0.8rem;
 }
 
 /* Mood Widget */
 .mood-tracker {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   margin: 15px 0;
 }
 
@@ -1531,17 +1178,6 @@ input:checked + .slider-round:before {
   height: 20px;
 }
 
-/* Dark theme overrides for widgets */
-.dark-theme .widget {
-  background-color: var(--card-bg);
-}
-
-.dark-theme #date,
-.dark-theme #mood-response {
-  color: var(--text-color);
-  opacity: 0.8;
-}
-
 /* Footer Styles */
 .footer {
   margin-top: 50px;
@@ -1559,12 +1195,6 @@ input:checked + .slider-round:before {
   color: var(--text-color);
   font-size: 0.9rem;
   margin: 0;
-}
-
-/* Dark theme override for footer */
-.dark-theme .footer {
-  background-color: var(--card-bg);
-  border-color: var(--border-color);
 }
 
 /* Challenge Instructions Section Styling */
@@ -1611,11 +1241,3 @@ input:checked + .slider-round:before {
   border-left: 3px solid var(--primary);
 }
 
-/* Dark theme overrides */
-.dark-theme .instruction-section {
-  background-color: rgba(123, 104, 238, 0.1);
-}
-
-.dark-theme .instruction-section p:last-child {
-  background-color: rgba(76, 201, 240, 0.1);
-}

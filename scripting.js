@@ -1,697 +1,617 @@
-// Simple JavaScript for interactive components
+// =================================================================================
+// INITIALIZATION
+// =================================================================================
 document.addEventListener("DOMContentLoaded", function () {
-  // Update slider values
-  const sliders = document.querySelectorAll(".slider");
-  sliders.forEach((slider) => {
-    const valueDisplay = slider.nextElementSibling;
-    valueDisplay.textContent = slider.value + "%";
-
-    slider.addEventListener("input", function () {
-      valueDisplay.textContent = this.value + "%";
-    });
-  });
-
-  // Chip close functionality
-  const chipCloses = document.querySelectorAll(".chip .close");
-  chipCloses.forEach((close) => {
-    close.addEventListener("click", function (e) {
-      e.stopPropagation();
-      this.parentElement.style.display = "none";
-      showToast("Chip removed", "info");
-    });
-  });
+    initializeSliders();
+    initializeChipCloseButtons();
+    initializeClock();
+    generateCalendar(currentCalendarDate); // Use the global state here
+    initializeCustomizationPanel();
 });
 
-// Accordion functionality
-function toggleAccordion(element) {
-  const content = element.nextElementSibling;
-  const isActive = content.classList.contains("active");
 
-  // Close all accordion items
-  document.querySelectorAll(".accordion-content").forEach((item) => {
-    item.classList.remove("active");
-  });
+// =================================================================================
+// GENERIC UI COMPONENTS
+// =================================================================================
 
-  document.querySelectorAll(".accordion-header i").forEach((icon) => {
-    icon.textContent = "expand_more";
-  });
+/**
+ * Manages the accordion component, allowing only one item to be open at a time.
+ * @param {HTMLElement} headerElement - The accordion header that was clicked.
+ */
+function toggleAccordion(headerElement) {
+    const content = headerElement.nextElementSibling;
+    const icon = headerElement.querySelector('i');
+    const isActive = content.classList.contains("active");
 
-  // Open clicked item if it wasn't already active
-  if (!isActive) {
-    content.classList.add("active");
-    element.querySelector("i").textContent = "expand_less";
-  }
-}
-
-// Modal functionality
-function openModal() {
-  document.getElementById("modal").style.display = "flex";
-}
-
-function closeModal() {
-  document.getElementById("modal").style.display = "none";
-}
-
-// Close modal when clicking outside the content
-window.onclick = function (event) {
-  const modal = document.getElementById("modal");
-  if (event.target === modal) {
-    closeModal();
-  }
-};
-
-// Toast functionality
-function showToast(message, type = "info") {
-  const toastContainer = document.getElementById("toastContainer");
-  const toast = document.createElement("div");
-  toast.className = `toast toast-${type}`;
-  toast.innerHTML = `
-                <div>${message}</div>
-                <span class="toast-close" onclick="this.parentElement.remove()">&times;</span>
-            `;
-
-  toastContainer.appendChild(toast);
-
-  // Show toast with animation
-  setTimeout(() => {
-    toast.classList.add("show");
-  }, 10);
-
-  // Auto remove after 5 seconds
-  setTimeout(() => {
-    if (toast.parentElement) {
-      toast.classList.remove("show");
-      setTimeout(() => {
-        if (toast.parentElement) {
-          toastContainer.removeChild(toast);
+    // Close all other accordion items first
+    document.querySelectorAll(".accordion-content.active").forEach((item) => {
+        if (item !== content) {
+            item.classList.remove("active");
+            item.previousElementSibling.classList.remove("active");
+            item.previousElementSibling.querySelector('i').textContent = "expand_more";
         }
-      }, 300);
-    }
-  }, 5000);
+    });
+
+    // Toggle the clicked item
+    content.classList.toggle("active");
+    headerElement.classList.toggle("active");
+    icon.textContent = isActive ? "expand_more" : "expand_less";
 }
 
-// Tab functionality
-function openTab(evt, tabId) {
-  // Hide all tab panes
-  document.querySelectorAll(".tab-pane").forEach((pane) => {
-    pane.style.display = "none";
-  });
 
-  // Remove active class from all tab links
-  document.querySelectorAll(".tab-link").forEach((link) => {
-    link.classList.remove("active");
-  });
-
-  // Show the selected tab pane
-  document.getElementById(tabId).style.display = "block";
-
-  // Add active class to the clicked tab link
-  evt.currentTarget.classList.add("active");
-}
-
-// Dropdown functionality
+/**
+ * Toggles the visibility of a dropdown menu.
+ * @param {HTMLElement} button - The button that toggles the dropdown.
+ */
 function toggleDropdown(button) {
-  const dropdownMenu = button.nextElementSibling;
-  dropdownMenu.classList.toggle("show");
+    const dropdownMenu = button.nextElementSibling;
+    const isShowing = dropdownMenu.classList.contains("show");
+    
+    // Close all other open dropdowns
+    document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+        if(menu !== dropdownMenu) {
+            menu.classList.remove('show');
+        }
+    });
 
-  // Close dropdown when clicking outside
-  window.onclick = function (e) {
-    if (!e.target.matches(".dropdown-toggle")) {
-      dropdownMenu.classList.remove("show");
-    }
-  };
+    // Toggle the current one
+    dropdownMenu.classList.toggle("show");
 }
 
-// Chip functionality
+// Close dropdowns when clicking elsewhere on the page
+window.addEventListener('click', function (e) {
+    if (!e.target.closest('.dropdown')) {
+        document.querySelectorAll('.dropdown-menu.show').forEach(menu => menu.classList.remove('show'));
+    }
+});
+
+
+/**
+ * Toggles the active state of a chip component.
+ * @param {HTMLElement} chip - The chip element to toggle.
+ */
 function toggleChip(chip) {
-  chip.classList.toggle("active");
-  const isActive = chip.classList.contains("active");
-  showToast(
-    `Chip ${isActive ? "activated" : "deactivated"}`,
-    isActive ? "success" : "info"
-  );
+    chip.classList.toggle("active");
+    const isActive = chip.classList.contains("active");
+    showToast(`Chip ${isActive ? "activated" : "deactivated"}`, isActive ? "success" : "info");
 }
 
+/**
+ * Removes a chip element from the DOM.
+ * @param {Event} event - The click event.
+ * @param {HTMLElement} chip - The chip element to remove.
+ */
 function removeChip(event, chip) {
-  event.stopPropagation();
-  chip.style.display = "none";
-  showToast("Chip removed", "info");
+    event.stopPropagation(); // Prevent toggleChip from firing
+    chip.style.display = "none";
+    showToast("Chip removed", "info");
 }
 
-// Switch functionality
+/**
+ * Displays a toast notification for switch state changes.
+ * @param {string} name - The name of the setting being toggled.
+ * @param {boolean} isChecked - The new state of the switch.
+ */
 function toggleSwitch(name, isChecked) {
-  showToast(
-    `${name} ${isChecked ? "enabled" : "disabled"}`,
-    isChecked ? "success" : "info"
-  );
+    showToast(`${name} ${isChecked ? "enabled" : "disabled"}`, isChecked ? "success" : "info");
 }
 
-// List item functionality
+/**
+ * Highlights a selected list item.
+ * @param {HTMLElement} item - The list item that was clicked.
+ */
 function selectListItem(item) {
-  document.querySelectorAll(".list-item").forEach((li) => {
-    li.style.backgroundColor = "";
-  });
-  item.style.backgroundColor = "rgba(67, 97, 238, 0.1)";
-  showToast(`Selected: ${item.querySelector("span").textContent}`, "success");
+    document.querySelectorAll(".list-item").forEach((li) => {
+        li.style.backgroundColor = "";
+    });
+    item.style.backgroundColor = "rgba(67, 97, 238, 0.1)";
+    showToast(`Selected: ${item.querySelector("span").textContent}`, "success");
 }
 
-// Form functionality
-function handleFormSubmit(event) {
-  event.preventDefault();
-  showToast("Form submitted successfully!", "success");
-
-  // Reset form
-  event.target.reset();
-}
-
-// Table functionality
-function editItem(button) {
-  const row = button.parentElement.parentElement;
-  const name = row.cells[0].textContent;
-  showToast(`Editing: ${name}`, "info");
-}
-
-function deleteItem(button) {
-  const row = button.parentElement.parentElement;
-  const name = row.cells[0].textContent;
-  row.style.opacity = "0.5";
-  showToast(`Deleted: ${name}`, "warning");
-}
-
-function sortTable(columnIndex) {
-  showToast(`Sorting by column ${columnIndex + 1}`, "info");
-}
-
-// Alert functionality
-function closeAlert(alert) {
-  alert.style.display = "none";
-}
-
+/**
+ * Displays a toast notification for alert buttons.
+ * @param {string} type - The type of alert ('success', 'warning', 'info').
+ */
 function showAlert(type) {
-  let message = "";
-  switch (type) {
-    case "success":
-      message = "This is a success message!";
-      break;
-    case "warning":
-      message = "This is a warning message!";
-      break;
-    case "info":
-      message = "This is an info message!";
-      break;
-  }
-  showToast(message, type);
-}
-
-// Progress bar functionality
-function animateProgress(id, targetWidth) {
-  const progressBar = document.getElementById(id);
-  progressBar.style.width = targetWidth + "%";
-  showToast(`Progress updated to ${targetWidth}%`, "success");
-}
-
-// Pagination functionality
-function changePage(page) {
-  showToast(`Navigating to page ${page}`, "info");
-}
-
-// Breadcrumb functionality
-function navigateBreadcrumb(page) {
-  showToast(`Navigating to ${page}`, "info");
-}
-
-// Navigation functionality
-function setActiveNav(item) {
-  document.querySelectorAll(".nav-item").forEach((navItem) => {
-    navItem.classList.remove("active");
-  });
-  item.classList.add("active");
-  showToast(`Navigating to ${item.textContent}`, "info");
-}
-
-// Update slider value display
-function updateSliderValue(slider, valueId) {
-  document.getElementById(valueId).textContent = slider.value + "%";
-}
-
-// Update opacity based on slider
-function updateOpacity(value) {
-  document.querySelectorAll(".section").forEach((section) => {
-    section.style.opacity = value / 100;
-  });
-}
-
-// Customization panel functionality
-function togglePanel() {
-  const panel = document.getElementById("customPanel");
-  const pullTab = document.getElementById("panelPullTab");
-  panel.classList.toggle("open");
-
-  // Show/hide pull tab based on panel state
-  if (panel.classList.contains("open")) {
-    pullTab.style.display = "none";
-  } else {
-    setTimeout(() => {
-      pullTab.style.display = "flex";
-    }, 300); // Match the panel transition time
-  }
-}
-// Handle keyboard shortcuts
-document.addEventListener("keydown", function (event) {
-  if (event.key === "Escape") {
-    const panel = document.getElementById("customPanel");
-    if (panel.classList.contains("open")) {
-      togglePanel();
+    let message = "";
+    switch (type) {
+        case "success": message = "This is a success message!"; break;
+        case "warning": message = "This is a warning message!"; break;
+        case "info": message = "This is an info message!"; break;
     }
-  }
-});
-
-// Handle click outside to close
-document.addEventListener("click", function (event) {
-  const panel = document.getElementById("customPanel");
-  const panelToggle = document.querySelector(".panel-toggle");
-  const pullTab = document.getElementById("panelPullTab");
-
-  if (pullTab.contains(event.target)) {
-    return;
-  }
-  if (
-    panel.classList.contains("open") &&
-    !panel.contains(event.target) &&
-    event.target !== panelToggle &&
-    !panelToggle.contains(event.target)
-  ) {
-    togglePanel();
-  }
-});
-
-// Add touch swipe support for mobile
-let touchStartX = 0;
-let touchEndX = 0;
-
-document.addEventListener(
-  "touchstart",
-  function (event) {
-    touchStartX = event.changedTouches[0].screenX;
-  },
-  false
-);
-
-document.addEventListener(
-  "touchend",
-  function (event) {
-    touchEndX = event.changedTouches[0].screenX;
-    handleSwipe();
-  },
-  false
-);
-
-function handleSwipe() {
-  const panel = document.getElementById("customPanel");
-  const swipeThreshold = 50; // minimum distance for swipe
-
-  // Right to left swipe (close panel)
-  if (
-    panel.classList.contains("open") &&
-    touchStartX - touchEndX > swipeThreshold
-  ) {
-    togglePanel();
-  }
-
-  // Left to right swipe (open panel)
-  if (
-    !panel.classList.contains("open") &&
-    touchEndX - touchStartX > swipeThreshold &&
-    touchStartX < 50
-  ) {
-    togglePanel();
-  }
+    showToast(message, type);
 }
 
-// Initialize panel state on page load
-document.addEventListener("DOMContentLoaded", function () {
-  const panel = document.getElementById("customPanel");
-  const pullTab = document.getElementById("panelPullTab");
+/**
+ * Closes an alert element.
+ * @param {HTMLElement} alert - The alert element to close.
+ */
+function closeAlert(alert) {
+    alert.style.display = "none";
+}
 
-  // Initial clock update
-  updateClock();
-  // Update clock every second
-  setInterval(updateClock, 1000);
+/**
+ * Opens the modal dialog.
+ */
+function openModal() {
+    document.getElementById("modal").style.display = "flex";
+}
 
-  // Generate calendar
-  generateCalendar();
+/**
+ * Closes the modal dialog.
+ */
+function closeModal() {
+    document.getElementById("modal").style.display = "none";
+}
 
-  if (!panel.classList.contains("open")) {
-    pullTab.style.display = "flex";
-  }
+// Close modal when clicking on the background overlay
+window.addEventListener('click', function (event) {
+    const modal = document.getElementById("modal");
+    if (event.target === modal) {
+        closeModal();
+    }
 });
+
+
+/**
+ * Displays a toast notification message.
+ * @param {string} message - The message to display.
+ * @param {string} [type='info'] - The type of toast ('success', 'warning', 'info').
+ */
+function showToast(message, type = "info") {
+    const toastContainer = document.getElementById("toastContainer");
+    const toast = document.createElement("div");
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `
+        <div>${message}</div>
+        <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
+    `;
+
+    toastContainer.appendChild(toast);
+
+    // Animate in
+    setTimeout(() => {
+        toast.classList.add("show");
+    }, 10);
+
+    // Automatically remove after 5 seconds
+    setTimeout(() => {
+        if (toast.parentElement) {
+            toast.classList.remove("show");
+            toast.addEventListener('transitionend', () => {
+                if(toast.parentElement) toastContainer.removeChild(toast);
+            });
+        }
+    }, 5000);
+}
+
+
+// =================================================================================
+// NAVIGATION & TABS
+// =================================================================================
+
+/**
+ * Switches between content tabs.
+ * @param {Event} evt - The click event.
+ * @param {string} tabId - The ID of the tab pane to show.
+ */
+function openTab(evt, tabId) {
+    document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove('active'));
+    document.querySelectorAll(".tab-link").forEach(link => link.classList.remove("active"));
+    document.getElementById(tabId).classList.add('active');
+    evt.currentTarget.classList.add("active");
+}
+
+/**
+ * Sets the active state for the main navigation.
+ * @param {HTMLElement} item - The nav item that was clicked.
+ */
+function setActiveNav(item) {
+    document.querySelectorAll(".nav-item").forEach(navItem => navItem.classList.remove("active"));
+    item.classList.add("active");
+    showToast(`Navigating to ${item.textContent}`, "info");
+}
+
+/**
+ * Simulates breadcrumb navigation.
+ * @param {string} page - The name of the page in the breadcrumb.
+ */
+function navigateBreadcrumb(page) {
+    showToast(`Navigating to ${page}`, "info");
+}
+
+/**
+ * Simulates pagination.
+ * @param {string|number} page - The page to navigate to ('prev', 'next', or a number).
+ */
+function changePage(page) {
+    showToast(`Navigating to page ${page}`, "info");
+}
+
+
+// =================================================================================
+// FORMS, TABLES, AND DATA
+// =================================================================================
+
+/**
+ * Handles form submission.
+ * @param {Event} event - The submit event.
+ */
+function handleFormSubmit(event) {
+    event.preventDefault();
+    showToast("Form submitted successfully!", "success");
+    event.target.reset();
+}
+
+/**
+ * Simulates editing a table row.
+ * @param {HTMLElement} button - The edit button that was clicked.
+ */
+function editItem(button) {
+    const row = button.closest('tr');
+    const name = row.cells[0].textContent;
+    showToast(`Editing: ${name}`, "info");
+}
+
+/**
+ * Simulates deleting a table row.
+ * @param {HTMLElement} button - The delete button that was clicked.
+ */
+function deleteItem(button) {
+    const row = button.closest('tr');
+    const name = row.cells[0].textContent;
+    row.style.opacity = "0.5";
+    showToast(`Deleted: ${name}`, "warning");
+}
+
+/**
+ * Simulates sorting a table.
+ * @param {number} columnIndex - The index of the column to sort by.
+ */
+function sortTable(columnIndex) {
+    showToast(`Sorting by column ${columnIndex + 1}`, "info");
+}
+
+/**
+ * Animates a progress bar to a target width.
+ * @param {string} id - The ID of the progress bar element.
+ * @param {number} targetWidth - The target width in percentage.
+ */
+function animateProgress(id, targetWidth) {
+    const progressBar = document.getElementById(id);
+    progressBar.style.width = targetWidth + "%";
+    showToast(`Progress updated to ${targetWidth}%`, "success");
+}
+
+/**
+ * Initializes all slider components on the page.
+ */
+function initializeSliders() {
+    document.querySelectorAll(".range-input").forEach((slider) => {
+        const valueDisplay = slider.parentElement.querySelector(".range-value");
+        if (valueDisplay) {
+            valueDisplay.textContent = slider.value;
+            slider.oninput = function () {
+                valueDisplay.textContent = this.value;
+            };
+        }
+    });
+}
+
+function updateSliderValue(slider, valueId) {
+    const valueDisplay = document.getElementById(valueId);
+    if (valueDisplay) {
+        const unit = (valueId.toLowerCase().includes('font') || valueId.toLowerCase().includes('radius')) ? 'px' : '%';
+        valueDisplay.textContent = slider.value + unit;
+    }
+}
+
+function updateOpacity(value) {
+    document.body.style.setProperty('--opacity-demo', value / 100);
+}
+
+
+/**
+ * Initializes close buttons for chips.
+ */
+function initializeChipCloseButtons() {
+    document.querySelectorAll(".chip-close").forEach((button) => {
+        button.onclick = function () {
+            this.closest(".chip").remove();
+        };
+    });
+}
+
+
+// =================================================================================
+// CUSTOMIZATION PANEL
+// =================================================================================
+function initializeCustomizationPanel() {
+    // Setup for demonstration purposes
+    const panel = document.getElementById("customPanel");
+    if (panel) {
+        // Simple logic for demonstrating panel state
+    }
+}
+
+function togglePanel() {
+    document.getElementById("customPanel").classList.toggle("open");
+}
 
 function changeColor(variable, color) {
-  document.documentElement.style.setProperty(`--${variable}`, color);
-
-  // Update active color indicator
-  document.querySelectorAll(".color-option").forEach((option) => {
-    option.classList.remove("active");
-  });
-  event.target.classList.add("active");
-
-  showToast(`Color changed to ${color}`, "success");
+    document.documentElement.style.setProperty(`--${variable}`, color);
+    document.querySelectorAll(".color-option").forEach(option => option.classList.remove("active"));
+    event.target.classList.add("active");
+    showToast(`Primary color changed`, "success");
 }
 
 function changeTheme(theme) {
-  let primary, secondary, light, dark, bodyBg, cardBg, textColor, borderColor;
+    const root = document.documentElement;
+    document.body.classList.remove('dark-theme');
 
-  switch (theme) {
-    case "dark":
-      // Dark theme colors
-      primary = "#7b68ee"; // Brighter purple for better visibility
-      secondary = "#4cc9f0"; // Bright blue for accents
-      light = "#2d3748"; // Dark gray for light elements
-      dark = "#f8f9fa"; // White for dark text
-      bodyBg = "#121212"; // Near black for body background
-      cardBg = "#1e1e1e"; // Dark gray for card backgrounds
-      textColor = "#e2e8f0"; // Light gray for text
-      borderColor = "#4a5568"; // Medium gray for borders
-      break;
-    case "blue":
-      primary = "#0077b6";
-      secondary = "#00b4d8";
-      light = "#caf0f8";
-      dark = "#03045e";
-      bodyBg = "#f5f7ff";
-      cardBg = "#ffffff";
-      textColor = "#212529";
-      borderColor = "#e9ecef";
-      break;
-    case "green":
-      primary = "#2a9d8f";
-      secondary = "#e9c46a";
-      light = "#e9f5db";
-      dark = "#264653";
-      bodyBg = "#f5f7ff";
-      cardBg = "#ffffff";
-      textColor = "#212529";
-      borderColor = "#e9ecef";
-      break;
-    default: // light
-      primary = "#4361ee";
-      secondary = "#3a0ca3";
-      light = "#f8f9fa";
-      dark = "#212529";
-      bodyBg = "#f5f7ff";
-      cardBg = "#ffffff";
-      textColor = "#212529";
-      borderColor = "#e9ecef";
-  }
+    if (theme === 'dark') {
+        document.body.classList.add('dark-theme');
+    } else if (theme === 'blue') {
+        root.style.setProperty('--primary', '#0077b6');
+        root.style.setProperty('--secondary', '#00b4d8');
+    } else if (theme === 'green') {
+        root.style.setProperty('--primary', '#2a9d8f');
+        root.style.setProperty('--secondary', '#e9c46a');
+    } else { // light / default
+        resetStyles();
+    }
 
-  // Set all theme-related CSS variables
-  document.documentElement.style.setProperty("--primary", primary);
-  document.documentElement.style.setProperty("--secondary", secondary);
-  document.documentElement.style.setProperty("--light", light);
-  document.documentElement.style.setProperty("--dark", dark);
-  document.documentElement.style.setProperty("--body-bg", bodyBg);
-  document.documentElement.style.setProperty("--card-bg", cardBg);
-  document.documentElement.style.setProperty("--text-color", textColor);
-  document.documentElement.style.setProperty("--border-color", borderColor);
-
-  // Apply theme class to body
-  if (theme === "dark") {
-    document.body.classList.add("dark-theme");
-  } else {
-    document.body.classList.remove("dark-theme");
-  }
-
-  showToast(`Theme changed to ${theme}`, "success");
+    showToast(`Theme changed to ${theme}`, "success");
 }
 
 function changeFontSize(size) {
-  document.documentElement.style.fontSize = size + "px";
-  document.getElementById("fontSizeValue").textContent = size + "px";
+    document.documentElement.style.fontSize = size + "px";
 }
 
 function changeBorderRadius(radius) {
-  document.documentElement.style.setProperty("--border-radius", radius + "px");
-  document.getElementById("borderRadiusValue").textContent = radius + "px";
-
-  // Apply to all elements with border-radius
-  document.querySelectorAll("*").forEach((el) => {
-    if (window.getComputedStyle(el).borderRadius !== "0px") {
-      el.style.borderRadius = radius + "px";
-    }
-  });
+    const rad = radius + 'px';
+    const root = document.documentElement;
+    root.style.setProperty('--card-border-radius', rad);
+    root.style.setProperty('--btn-border-radius', rad);
+    // You can add more variables here to control more elements
 }
 
 function resetStyles() {
-  // Reset CSS variables to default values
-  document.documentElement.style.setProperty("--primary", "#4361ee");
-  document.documentElement.style.setProperty("--secondary", "#3a0ca3");
-  document.documentElement.style.setProperty("--light", "#f8f9fa");
-  document.documentElement.style.setProperty("--dark", "#212529");
-  document.documentElement.style.setProperty("--body-bg", "#f5f7ff");
-  document.documentElement.style.setProperty("--card-bg", "#ffffff");
-  document.documentElement.style.setProperty("--text-color", "#212529");
-  document.documentElement.style.setProperty("--border-color", "#e9ecef");
-
-  // Remove dark theme class
-  document.body.classList.remove("dark-theme");
-
-  // Reset font size to default (16px)
-  document.documentElement.style.fontSize = "16px";
-  document.getElementById("fontSize").value = "16";
-  document.getElementById("fontSizeValue").textContent = "16px";
-
-  // Reset border radius to default (5px)
-  document.documentElement.style.setProperty("--border-radius", "5px");
-  document.getElementById("borderRadius").value = "5";
-  document.getElementById("borderRadiusValue").textContent = "5px";
-
-  // Reset theme selector
-  document.getElementById("themeSelect").value = "light";
-
-  // Remove active state from color options
-  document.querySelectorAll(".color-option").forEach((option) => {
-    option.classList.remove("active");
-  });
-
-  // Add active class to the default primary color option
-  const defaultColorOption = document.querySelector(
-    '.color-option[style*="#4361ee"]'
-  );
-  if (defaultColorOption) {
-    defaultColorOption.classList.add("active");
-  }
-
-  showToast("Styles reset to default", "success");
+    const root = document.documentElement;
+    document.body.classList.remove('dark-theme');
+    root.style.setProperty('--primary', '#4361ee');
+    root.style.setProperty('--secondary', '#3a0ca3');
+    root.style.fontSize = '16px';
+    document.getElementById('fontSize').value = 16;
+    document.getElementById('fontSizeValue').textContent = '16px';
+    document.getElementById('themeSelect').value = 'light';
+    showToast("Styles reset to default", "success");
 }
+
+
+// =================================================================================
+// INTERACTIVE WIDGETS (Clock, Calendar, Mood)
+// =================================================================================
 
 let clockType = "digital";
 
-// Function to set clock type
-function setClockType(type) {
-  clockType = type;
+function initializeClock() {
+    // Try multiple ID fallbacks so the script works with different HTML versions
+    const clockElement = document.getElementById("current-time") || document.getElementById("clock");
+    const dateElement = document.getElementById("current-date") || document.getElementById("date");
 
-  // Update toggle buttons
-  document
-    .getElementById("digitalToggle")
-    .classList.toggle("active", type === "digital");
-  document
-    .getElementById("analogToggle")
-    .classList.toggle("active", type === "analog");
-
-  // Show/hide appropriate clock display
-  const analogContainer = document.getElementById("analog-clock-container");
-  const digitalClock = document.getElementById("clock");
-
-  if (type === "digital") {
-    analogContainer.style.display = "none";
-    digitalClock.style.display = "block";
-  } else {
-    analogContainer.style.display = "flex";
-    digitalClock.style.display = "none";
-    drawAnalogClock(); // Initial draw
-  }
-}
-
-// Clock and date function
-function updateClock() {
-  const now = new Date();
-
-  if (clockType === "digital") {
-    const timeString = now.toLocaleTimeString();
-    document.getElementById("clock").textContent = timeString;
-  } else {
-    drawAnalogClock();
-  }
-
-  // Update date in both modes
-  const dateString = now.toLocaleDateString(undefined, {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-  document.getElementById("date").textContent = dateString;
-}
-
-// Function to draw analog clock
-function drawAnalogClock() {
-  const canvas = document.getElementById("analog-clock");
-  const ctx = canvas.getContext("2d");
-  const radius = canvas.height / 2;
-
-  // Clear canvas
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // Draw clock face
-  ctx.beginPath();
-  ctx.arc(radius, radius, radius * 0.9, 0, 2 * Math.PI);
-  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue(
-    "--card-bg"
-  );
-  ctx.fill();
-
-  // Draw clock border
-  ctx.beginPath();
-  ctx.arc(radius, radius, radius * 0.9, 0, 2 * Math.PI);
-  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue(
-    "--primary"
-  );
-  ctx.lineWidth = radius * 0.05;
-  ctx.stroke();
-
-  // Draw hour markers
-  for (let i = 0; i < 12; i++) {
-    const angle = (i * Math.PI) / 6;
-    ctx.beginPath();
-    const innerRadius = radius * 0.8;
-    const outerRadius = radius * 0.9;
-    ctx.moveTo(
-      radius + innerRadius * Math.sin(angle),
-      radius - innerRadius * Math.cos(angle)
-    );
-    ctx.lineTo(
-      radius + outerRadius * Math.sin(angle),
-      radius - outerRadius * Math.cos(angle)
-    );
-    ctx.lineWidth = radius * 0.02;
-    ctx.strokeStyle = getComputedStyle(
-      document.documentElement
-    ).getPropertyValue("--dark");
-    ctx.stroke();
-  }
-
-  // Draw center point
-  ctx.beginPath();
-  ctx.arc(radius, radius, radius * 0.05, 0, 2 * Math.PI);
-  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue(
-    "--primary"
-  );
-  ctx.fill();
-
-  // Get current time
-  const now = new Date();
-  const hour = now.getHours() % 12;
-  const minute = now.getMinutes();
-  const second = now.getSeconds();
-
-  // Draw hour hand
-  const hourAngle = ((hour + minute / 60) * Math.PI) / 6;
-  drawHand(ctx, hourAngle, radius * 0.5, radius * 0.05);
-
-  // Draw minute hand
-  const minuteAngle = ((minute + second / 60) * Math.PI) / 30;
-  drawHand(ctx, minuteAngle, radius * 0.7, radius * 0.04);
-
-  // Draw second hand
-  const secondAngle = (second * Math.PI) / 30;
-  ctx.beginPath();
-  ctx.moveTo(radius, radius);
-  ctx.lineTo(
-    radius + radius * 0.8 * Math.sin(secondAngle),
-    radius - radius * 0.8 * Math.cos(secondAngle)
-  );
-  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue(
-    "--warning"
-  );
-  ctx.lineWidth = radius * 0.01;
-  ctx.stroke();
-}
-
-// Function to draw clock hands
-function drawHand(ctx, angle, length, width) {
-  const radius = ctx.canvas.height / 2;
-  ctx.beginPath();
-  ctx.moveTo(radius, radius);
-  ctx.lineTo(
-    radius + length * Math.sin(angle),
-    radius - length * Math.cos(angle)
-  );
-  ctx.lineWidth = width;
-  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue(
-    "--dark"
-  );
-  ctx.stroke();
-}
-
-// Calendar function
-function generateCalendar() {
-  const now = new Date();
-  const month = now.getMonth();
-  const year = now.getFullYear();
-  const currentDay = now.getDate();
-
-  // Set the current month name
-  const monthName = now.toLocaleString("default", { month: "long" });
-  document.getElementById("current-month").textContent = `${monthName} ${year}`;
-
-  const calendarElement = document.getElementById("mini-calendar");
-  calendarElement.innerHTML = "";
-
-  // Add day names
-  const dayNames = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
-  dayNames.forEach((day) => {
-    const dayElement = document.createElement("div");
-    dayElement.className = "calendar-day day-name";
-    dayElement.textContent = day;
-    calendarElement.appendChild(dayElement);
-  });
-
-  // Get first day of month and total days
-  const firstDay = new Date(year, month, 1).getDay();
-  const totalDays = new Date(year, month + 1, 0).getDate();
-
-  // Add empty spaces for days before the 1st
-  for (let i = 0; i < firstDay; i++) {
-    const emptyDay = document.createElement("div");
-    emptyDay.className = "calendar-day empty";
-    calendarElement.appendChild(emptyDay);
-  }
-
-  // Add days of the month
-  for (let day = 1; day <= totalDays; day++) {
-    const dayElement = document.createElement("div");
-    dayElement.className = "calendar-day";
-    dayElement.textContent = day;
-
-    // Highlight current day
-    if (day === currentDay) {
-      dayElement.classList.add("current");
+    if (!clockElement && !dateElement) {
+        console.warn("Clock/date elements not found. Skipping clock initialization.");
+        return;
     }
 
-    calendarElement.appendChild(dayElement);
-  }
+    function updateClock() {
+        const now = new Date();
+
+        // Time format: HH:MM:SS (24-hour, British English standard)
+        const timeString = now.toLocaleTimeString('en-GB', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        });
+
+        // Date format: Weekday, Day Month Year
+        const dateString = now.toLocaleDateString('en-GB', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        if (clockElement) clockElement.textContent = timeString;
+        if (dateElement) dateElement.textContent = dateString;
+    }
+
+    updateClock(); // Initial call to display immediately
+    setInterval(updateClock, 1000); // Update every second
 }
 
-// Mood tracking function
-function trackMood(emoji) {
-  const responses = {
-    "😄": "Great to see you happy today!",
-    "🙂": "Looking good! Have a nice day.",
-    "😐": "Hope your day gets better soon.",
-    "😢": "Sorry you're feeling down.",
-    "😤": "Take a deep breath, things will improve.",
-  };
+/**
+ * Sets the clock type (digital or analog) and updates UI accordingly.
+ * Buttons in the HTML call this: setClockType('digital') or setClockType('analog')
+ */
+function setClockType(type) {
+    clockType = type;
+    const digitalToggle = document.getElementById("digitalToggle");
+    const analogToggle = document.getElementById("analogToggle");
+    const analogContainer = document.getElementById("analog-clock-container");
+    const clockEl = document.getElementById("clock") || document.getElementById("current-time");
 
-  document.getElementById("mood-response").textContent = responses[emoji];
-  showToast(`Mood set to ${emoji}`, "success");
+    if (digitalToggle) digitalToggle.classList.toggle("active", type === "digital");
+    if (analogToggle) analogToggle.classList.toggle("active", type === "analog");
+    if (analogContainer) analogContainer.style.display = type === "analog" ? "flex" : "none";
+    if (clockEl) clockEl.style.display = type === "digital" ? "block" : "none";
+
+    if (type === 'analog' && typeof drawAnalogClock === 'function') {
+        drawAnalogClock();
+    }
+}
+
+/**
+ * Draws a simple analog clock on the canvas with id 'analog-clock' if present.
+ */
+function drawAnalogClock() {
+    const canvas = document.getElementById("analog-clock");
+    if (!canvas || !canvas.getContext) return;
+    const ctx = canvas.getContext("2d");
+    const radius = Math.min(canvas.width, canvas.height) / 2;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.save();
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    const scaledRadius = radius * 0.90;
+
+    // Face
+    ctx.beginPath();
+    ctx.arc(0, 0, scaledRadius, 0, 2 * Math.PI);
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--card-bg') || '#fff';
+    ctx.fill();
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary') || '#4361ee';
+    ctx.lineWidth = Math.max(2, scaledRadius * 0.03);
+    ctx.stroke();
+
+    // Ticks
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-color') || '#333';
+    for (let num = 0; num < 12; num++) {
+        const ang = num * Math.PI / 6;
+        const x = Math.cos(ang) * (scaledRadius * 0.85);
+        const y = Math.sin(ang) * (scaledRadius * 0.85);
+        ctx.beginPath();
+        ctx.arc(x, y, Math.max(1, scaledRadius * 0.02), 0, 2 * Math.PI);
+        ctx.fill();
+    }
+
+    // Hands
+    const now = new Date();
+    const hour = now.getHours() % 12;
+    const minute = now.getMinutes();
+    const second = now.getSeconds();
+
+    const hourAngle = (hour * Math.PI / 6) + (minute * Math.PI / (6 * 60)) + (second * Math.PI / (360 * 60));
+    drawHand(ctx, hourAngle, scaledRadius * 0.5, scaledRadius * 0.07);
+
+    const minuteAngle = (minute * Math.PI / 30) + (second * Math.PI / (30 * 60));
+    drawHand(ctx, minuteAngle, scaledRadius * 0.8, scaledRadius * 0.05);
+
+    const secondAngle = (second * Math.PI / 30);
+    drawHand(ctx, secondAngle, scaledRadius * 0.9, scaledRadius * 0.02, 'red');
+
+    ctx.restore();
+}
+
+function drawHand(ctx, angle, length, width, color) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.lineWidth = width;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = color || (getComputedStyle(document.documentElement).getPropertyValue('--text-color') || '#333');
+    ctx.rotate(angle);
+    ctx.moveTo(0, 0);
+    ctx.lineTo(0, -length);
+    ctx.stroke();
+    ctx.restore();
+}
+
+// Global state to track the currently viewed month in the calendar
+let currentCalendarDate = new Date();
+
+/**
+ * Generates the calendar grid for a specific month.
+ * @param {Date} date - The date object representing the month to display.
+ */
+function generateCalendar(date) {
+    // Support multiple container IDs used across different HTML variants
+    const calendarElement = document.getElementById("calendar-days") || document.getElementById("mini-calendar");
+    const monthTitleElement = document.getElementById("current-month");
+
+    if (!calendarElement || !monthTitleElement) {
+        console.warn("Calendar elements not found. Skipping calendar generation.");
+        return;
+    }
+
+    calendarElement.innerHTML = ''; // Clear existing days
+
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const now = new Date(); // Used only to determine the current day for highlighting
+    const currentDay = now.getDate();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    // Set the month title (e.g., "September 2025")
+    monthTitleElement.textContent = date.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+
+    // 1. Add Day Names (Su, Mo, Tu, etc.)
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    dayNames.forEach(day => {
+        const dayNameEl = document.createElement('div');
+        dayNameEl.className = 'calendar-day day-name';
+        dayNameEl.textContent = day;
+        calendarElement.appendChild(dayNameEl);
+    });
+
+    // 2. Determine start and end of the month
+    // getDay() returns 0 for Sunday, 1 for Monday...
+    const firstDayOfMonth = new Date(year, month, 1).getDay();
+    // Setting day to 0 gets the last day of the previous month.
+    const daysInMonth = new Date(year, month + 1, 0).getDate(); 
+
+    // 3. Create placeholders for preceding days
+    for (let i = 0; i < firstDayOfMonth; i++) {
+        const placeholder = document.createElement('div');
+        placeholder.className = 'calendar-day empty';
+        calendarElement.appendChild(placeholder);
+    }
+
+    // 4. Create day elements
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dayEl = document.createElement('div');
+        dayEl.className = 'calendar-day';
+        dayEl.textContent = day;
+        
+        // Highlight the current day if we are viewing the current month/year
+        if (day === currentDay && month === currentMonth && year === currentYear) {
+            dayEl.classList.add('current');
+        }
+        
+        calendarElement.appendChild(dayEl);
+    }
+}
+
+/**
+ * Navigates the calendar to the previous month.
+ */
+function prevMonth() {
+    // Set date to the 1st of the previous month to avoid issues with short months (e.g., setting Feb 31st)
+    currentCalendarDate.setDate(1); 
+    currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+    generateCalendar(currentCalendarDate);
+}
+
+/**
+ * Navigates the calendar to the next month.
+ */
+function nextMonth() {
+    // Set date to the 1st of the next month
+    currentCalendarDate.setDate(1);
+    currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+    generateCalendar(currentCalendarDate);
+}
+
+function trackMood(emoji) {
+    const responses = {
+        "😄": "Glad you're feeling great!",
+        "🙂": "Have a wonderful day!",
+        "😐": "Hope things look up soon.",
+        "😢": "Sending positive vibes your way.",
+        "😤": "Take a deep breath. You've got this.",
+    };
+    document.getElementById("mood-response").textContent = responses[emoji];
+    showToast(`Mood logged: ${emoji}`, "success");
 }
