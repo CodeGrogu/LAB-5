@@ -54,7 +54,7 @@
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label">Theme</label>
+          <label class="form-label" for="themeSelect">Theme</label>
           <select
             class="form-select"
             id="themeSelect"
@@ -67,7 +67,7 @@
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Font Size</label>
+          <label class="form-label" for="fontSize">Font Size</label>
           <input
             type="range"
             min="12"
@@ -80,7 +80,7 @@
           <div class="slider-value" id="fontSizeValue">16px</div>
         </div>
         <div class="form-group">
-          <label class="form-label">Border Radius</label>
+          <label class="form-label" for="borderRadius">Border Radius</label>
           <input
             type="range"
             min="0"
@@ -532,14 +532,16 @@
                 types.
               </p>
 
-              <form onsubmit="handleFormSubmit(event)">
+              <form id="contactForm" autocomplete="on">
                 <div class="form-group">
                   <label class="form-label" for="name">Name</label>
                   <input
                     type="text"
                     id="name"
+                    name="name"
                     class="form-input"
                     placeholder="Enter your name"
+                    autocomplete="name"
                     required
                   />
                 </div>
@@ -549,15 +551,17 @@
                   <input
                     type="email"
                     id="email"
+                    name="email"
                     class="form-input"
                     placeholder="Enter your email"
+                    autocomplete="email"
                     required
                   />
                 </div>
 
                 <div class="form-group">
                   <label class="form-label" for="category">Category</label>
-                  <select id="category" class="form-select">
+                  <select id="category" name="category" class="form-select" autocomplete="off">
                     <option value="">Select a category</option>
                     <option value="1">Web Development</option>
                     <option value="2">UI/UX Design</option>
@@ -571,15 +575,17 @@
                   <label class="form-label" for="message">Message</label>
                   <textarea
                     id="message"
+                    name="message"
                     class="form-textarea"
                     placeholder="Enter your message"
+                    autocomplete="off"
                   ></textarea>
                 </div>
 
                 <div class="form-group">
                   <div class="switch-container">
                     <label class="switch">
-                      <input type="checkbox" id="newsletter" />
+                      <input type="checkbox" id="newsletter" name="newsletter" autocomplete="off" />
                       <span class="slider-round"></span>
                     </label>
                     <span>Subscribe to newsletter</span>
@@ -790,19 +796,19 @@
 
               <ul class="pagination">
                 <li class="page-item">
-                  <a class="page-link" onclick="changePage('prev')">Previous</a>
+                  <a class="page-link" data-page="prev">Previous</a>
                 </li>
                 <li class="page-item">
-                  <a class="page-link" onclick="changePage(1)">1</a>
+                  <a class="page-link" data-page="1">1</a>
                 </li>
                 <li class="page-item active">
-                  <a class="page-link" onclick="changePage(2)">2</a>
+                  <a class="page-link" data-page="2">2</a>
                 </li>
                 <li class="page-item">
-                  <a class="page-link" onclick="changePage(3)">3</a>
+                  <a class="page-link" data-page="3">3</a>
                 </li>
                 <li class="page-item">
-                  <a class="page-link" onclick="changePage('next')">Next</a>
+                  <a class="page-link" data-page="next">Next</a>
                 </li>
               </ul>
             </div>
@@ -816,18 +822,10 @@
 
               <ul class="breadcrumb">
                 <li class="breadcrumb-item">
-                  <a
-                    class="breadcrumb-link"
-                    onclick="navigateBreadcrumb('Home')"
-                    >Home</a
-                  >
+                  <a class="breadcrumb-link" data-page="Home">Home</a>
                 </li>
                 <li class="breadcrumb-item">
-                  <a
-                    class="breadcrumb-link"
-                    onclick="navigateBreadcrumb('Components')"
-                    >Components</a
-                  >
+                  <a class="breadcrumb-link" data-page="Components">Components</a>
                 </li>
                 <li class="breadcrumb-item active">Breadcrumbs</li>
               </ul>

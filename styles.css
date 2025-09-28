@@ -516,6 +516,9 @@ input:checked + .slider-round:before {
 .nav {
     display: flex;
     gap: 8px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
     background-color: var(--light-gray);
     padding: 8px;
     border-radius: 10px;

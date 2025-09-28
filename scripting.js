@@ -6,6 +6,9 @@ document.addEventListener("DOMContentLoaded", function () {
     initializeChipCloseButtons();
     initializeClock();
     generateCalendar(currentCalendarDate); // Use the global state here
+    initializePagination();
+    initializeBreadcrumbs();
+    initializeForms();
     initializeCustomizationPanel();
 });
 
@@ -207,9 +210,66 @@ function openTab(evt, tabId) {
  * @param {HTMLElement} item - The nav item that was clicked.
  */
 function setActiveNav(item) {
+    // Normalise items
     document.querySelectorAll(".nav-item").forEach(navItem => navItem.classList.remove("active"));
     item.classList.add("active");
-    showToast(`Navigating to ${item.textContent}`, "info");
+
+    const desired = String(item.textContent || '').trim().toLowerCase();
+    let handled = false;
+
+    // Try to activate a matching tab
+    const tabLinks = Array.from(document.querySelectorAll('.tab-link'));
+    const matchTab = tabLinks.find(t => t.textContent.trim().toLowerCase() === desired);
+    if (matchTab) {
+        // Trigger the click so openTab receives an event and handles content switching
+        matchTab.click();
+        handled = true;
+    }
+
+    // If no tab matched, try to scroll to a section whose id or class matches the nav text
+    if (!handled) {
+        // Special-case Home -> scroll to header/top
+        if (desired === 'home') {
+            const header = document.querySelector('header') || document.querySelector('.container');
+            if (header) {
+                try { header.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { header.scrollIntoView(); }
+                handled = true;
+            }
+        }
+
+        // Try matching section headings (H2) text to the nav label (e.g., 'Buttons', 'Forms')
+        if (!handled) {
+            const headings = Array.from(document.querySelectorAll('.section h2'));
+            const matchHeading = headings.find(h => h.textContent.trim().toLowerCase() === desired);
+            if (matchHeading) {
+                const section = matchHeading.closest('.section');
+                if (section) {
+                    try { section.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { section.scrollIntoView(); }
+                    handled = true;
+                }
+            }
+        }
+
+        // Last-resort: try id, data-section, or class selectors
+        if (!handled) {
+            let target = null;
+            try {
+                target = document.getElementById(desired)
+                    || document.querySelector(`[data-section="${desired}"]`)
+                    || document.querySelector(`.${CSS && CSS.escape ? CSS.escape(desired) : desired}`);
+            } catch (e) {
+                // ignore selector errors
+                target = document.getElementById(desired) || document.querySelector(`[data-section="${desired}"]`);
+            }
+            if (target) {
+                try { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch(e) { target.scrollIntoView(); }
+                handled = true;
+            }
+        }
+    }
+
+    // Only show a toast if no other navigation occurred
+    if (!handled) showToast(`Navigating to ${item.textContent}`, "info");
 }
 
 /**
@@ -217,7 +277,42 @@ function setActiveNav(item) {
  * @param {string} page - The name of the page in the breadcrumb.
  */
 function navigateBreadcrumb(page) {
-    showToast(`Navigating to ${page}`, "info");
+    if (!page) return;
+
+    const desired = String(page).trim().toLowerCase();
+    let handled = false;
+
+    // 1) Try to activate the main nav item that matches the breadcrumb
+    const navItems = Array.from(document.querySelectorAll('.nav-item'));
+    const matchNav = navItems.find(n => n.textContent.trim().toLowerCase() === desired);
+    if (matchNav) {
+        // Use existing helper to set active state and fire any side-effects
+        setActiveNav(matchNav);
+        // Ensure it's visible
+        try { matchNav.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+        handled = true;
+    }
+
+    // 2) If there is a tab with the same label, trigger it (delegates to openTab)
+    const tabLinks = Array.from(document.querySelectorAll('.tab-link'));
+    const matchTab = tabLinks.find(t => t.textContent.trim().toLowerCase() === desired);
+    if (matchTab) {
+        // If the tab has an onclick handler that expects an event, fire a click so it receives a proper event
+        matchTab.click();
+        handled = true;
+    }
+
+    // 3) Update breadcrumb active class so the UI reflects the current location
+    document.querySelectorAll('.breadcrumb-item').forEach((li) => {
+        li.classList.remove('active');
+        const link = li.querySelector('.breadcrumb-link');
+        if (link && link.textContent.trim().toLowerCase() === desired) {
+            li.classList.add('active');
+        }
+    });
+
+    // Only show a toast if no other handler produced one
+    if (!handled) showToast(`Navigating to ${page}`, "info");
 }
 
 /**
@@ -225,7 +320,147 @@ function navigateBreadcrumb(page) {
  * @param {string|number} page - The page to navigate to ('prev', 'next', or a number).
  */
 function changePage(page) {
-    showToast(`Navigating to page ${page}`, "info");
+    // Find pagination container and items
+    const pagination = document.querySelector('.pagination');
+    if (!pagination) {
+        showToast(`Navigating to page ${page}`, "info");
+        return;
+    }
+    const items = Array.from(pagination.querySelectorAll('.page-item'));
+    if (items.length === 0) {
+        showToast(`Navigating to page ${page}`, "info");
+        return;
+    }
+
+    // Helper: filter numeric page items (exclude prev/next or other controls)
+    const numericItems = items.filter(li => {
+        const link = li.querySelector('.page-link');
+        if (!link) return false;
+        const text = link.textContent.trim().toLowerCase();
+        // treat anything that is a plain number as a page
+        return !isNaN(Number(text)) && text !== '';
+    });
+
+    if (numericItems.length === 0) {
+        // fallback: treat all items as pages
+        numericItems.push(...items);
+    }
+
+    // Find currently active numeric index
+    let activeNumericIndex = numericItems.findIndex(li => li.classList.contains('active'));
+    if (activeNumericIndex === -1) {
+        // If no numeric is active, try to find any active and map to numeric list
+        const anyActive = items.findIndex(li => li.classList.contains('active'));
+        if (anyActive !== -1) {
+            activeNumericIndex = Math.max(0, numericItems.findIndex((nli) => items.indexOf(nli) >= anyActive));
+        }
+    }
+    if (activeNumericIndex === -1) activeNumericIndex = 0;
+
+    // Compute target numeric index
+    let targetNumericIndex = activeNumericIndex;
+    if (page === 'prev') {
+        targetNumericIndex = Math.max(0, activeNumericIndex - 1);
+    } else if (page === 'next') {
+        targetNumericIndex = Math.min(numericItems.length - 1, activeNumericIndex + 1);
+    } else {
+        const num = Number(page);
+        if (!Number.isNaN(num)) {
+            // num is 1-based; find matching numeric item whose link text equals num
+            const matchIndex = numericItems.findIndex(li => Number(li.querySelector('.page-link').textContent.trim()) === num);
+            if (matchIndex !== -1) targetNumericIndex = matchIndex;
+            else targetNumericIndex = Math.max(0, Math.min(numericItems.length - 1, num - 1));
+        }
+    }
+
+    // Clear active on all items, set active only on the chosen numeric item
+    items.forEach(li => li.classList.remove('active'));
+    const chosenItem = numericItems[targetNumericIndex];
+    if (chosenItem) chosenItem.classList.add('active');
+
+    // Update aria-current for accessibility on page links
+    items.forEach(li => {
+        const link = li.querySelector('.page-link');
+        if (!link) return;
+        if (li.classList.contains('active')) link.setAttribute('aria-current', 'page');
+        else link.removeAttribute('aria-current');
+    });
+
+    // Enable/disable prev and next buttons based on bounds
+    const prevItem = items.find(li => {
+        const t = (li.querySelector('.page-link') || {}).textContent || '';
+        return /prev|previous|‹|<|«/i.test(t.trim());
+    });
+    const nextItem = items.find(li => {
+        const t = (li.querySelector('.page-link') || {}).textContent || '';
+        return /next|›|>|»/i.test(t.trim());
+    });
+
+    if (prevItem) {
+        const isDisabled = targetNumericIndex <= 0;
+        prevItem.classList.toggle('disabled', isDisabled);
+        const plink = prevItem.querySelector('.page-link');
+        if (plink) plink.setAttribute('aria-disabled', isDisabled ? 'true' : 'false');
+    }
+    if (nextItem) {
+        const isDisabled = targetNumericIndex >= numericItems.length - 1;
+        nextItem.classList.toggle('disabled', isDisabled);
+        const nlink = nextItem.querySelector('.page-link');
+        if (nlink) nlink.setAttribute('aria-disabled', isDisabled ? 'true' : 'false');
+    }
+
+    // Notify the user
+    const pageLabel = chosenItem ? (chosenItem.querySelector('.page-link').textContent.trim() || (targetNumericIndex + 1).toString()) : (targetNumericIndex + 1).toString();
+    showToast(`Navigated to page ${pageLabel}`, 'info');
+}
+
+/**
+ * Sets up click delegation for pagination so clicks on page links trigger changePage.
+ */
+function initializePagination() {
+    const pagination = document.querySelector('.pagination');
+    if (!pagination) return;
+    pagination.addEventListener('click', function (e) {
+        const link = e.target.closest('.page-link');
+        if (!link) return;
+        // If the link already defines an inline onclick handler, don't duplicate handling here.
+        // The inline handler will run on the click event; skip delegated handling to avoid double updates.
+        // If a data-page attribute is present, delegation should handle it. If not and an inline onclick exists, skip.
+        if (!link.hasAttribute('data-page') && link.hasAttribute && link.hasAttribute('onclick')) return;
+        e.preventDefault();
+
+        const textRaw = link.textContent || '';
+        const text = textRaw.trim().toLowerCase();
+
+        if (/^\s*(previous|prev|‹|<|«)\s*$/i.test(textRaw)) {
+            changePage('prev');
+            return;
+        }
+        if (/^\s*(next|›|>|»)\s*$/i.test(textRaw)) {
+            changePage('next');
+            return;
+        }
+
+        const num = Number(text);
+        if (!Number.isNaN(num)) changePage(num);
+        else changePage(text);
+    });
+}
+
+/**
+ * Delegates breadcrumb clicks to navigateBreadcrumb using data-page attributes.
+ */
+function initializeBreadcrumbs() {
+    const breadcrumb = document.querySelector('.breadcrumb');
+    if (!breadcrumb) return;
+
+    breadcrumb.addEventListener('click', function (e) {
+        const link = e.target.closest('.breadcrumb-link');
+        if (!link) return;
+        e.preventDefault();
+        const page = link.getAttribute('data-page') || link.textContent;
+        if (page) navigateBreadcrumb(page);
+    });
 }
 
 
@@ -241,6 +476,25 @@ function handleFormSubmit(event) {
     event.preventDefault();
     showToast("Form submitted successfully!", "success");
     event.target.reset();
+}
+
+/**
+ * Attach submit handlers to forms to avoid inline attributes and duplicate handling.
+ */
+function initializeForms() {
+    const form = document.getElementById('contactForm');
+    if (!form) return;
+
+    // If an inline onsubmit exists, remove it (we prefer JS binding)
+    if (form.hasAttribute && form.hasAttribute('onsubmit')) {
+        form.removeAttribute('onsubmit');
+    }
+
+    form.addEventListener('submit', function (e) {
+        // Prevent bubbling double-invocations if other handlers exist
+        e.stopImmediatePropagation();
+        handleFormSubmit(e);
+    });
 }
 
 /**
@@ -269,7 +523,70 @@ function deleteItem(button) {
  * @param {number} columnIndex - The index of the column to sort by.
  */
 function sortTable(columnIndex) {
-    showToast(`Sorting by column ${columnIndex + 1}`, "info");
+    // Find the first table on the page
+    const table = document.querySelector('.table');
+    if (!table) {
+        showToast('No table found to sort', 'warning');
+        return;
+    }
+
+    const tbody = table.tBodies[0];
+    if (!tbody) {
+        showToast('Table has no body to sort', 'warning');
+        return;
+    }
+
+    // Determine current sort state stored on the table
+    const currentCol = Number(table.getAttribute('data-sort-col'));
+    let direction = table.getAttribute('data-sort-dir') || 'asc';
+
+    if (!Number.isNaN(currentCol) && currentCol === columnIndex) {
+        // toggle direction
+        direction = direction === 'asc' ? 'desc' : 'asc';
+    } else {
+        direction = 'asc';
+    }
+
+    // Collect rows
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+    // Helper to get cell text and coerce to number when appropriate
+    const getCellValue = (row, idx) => {
+        const cell = row.cells[idx];
+        if (!cell) return '';
+        const text = cell.textContent.trim();
+        const num = Number(text.replace(/[^0-9.\-]/g, ''));
+        return (!Number.isNaN(num) && text.match(/[0-9]/)) ? num : text.toLowerCase();
+    };
+
+    rows.sort((a, b) => {
+        const av = getCellValue(a, columnIndex);
+        const bv = getCellValue(b, columnIndex);
+
+        if (typeof av === 'number' && typeof bv === 'number') {
+            return direction === 'asc' ? av - bv : bv - av;
+        }
+
+        if (av < bv) return direction === 'asc' ? -1 : 1;
+        if (av > bv) return direction === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    // Remove existing rows and append in sorted order
+    rows.forEach(r => tbody.appendChild(r));
+
+    // Store current sort state
+    table.setAttribute('data-sort-col', columnIndex);
+    table.setAttribute('data-sort-dir', direction);
+
+    // Update header visuals: clear previous indicators and set on current TH
+    const headers = table.querySelectorAll('th');
+    headers.forEach((th, idx) => {
+        th.classList.remove('sorted-asc', 'sorted-desc');
+        if (idx === columnIndex) th.classList.add(direction === 'asc' ? 'sorted-asc' : 'sorted-desc');
+    });
+
+    showToast(`Sorted by column ${columnIndex + 1} (${direction})`, 'info');
 }
 
 /**
