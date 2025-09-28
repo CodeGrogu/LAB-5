@@ -10,6 +10,8 @@ document.addEventListener("DOMContentLoaded", function () {
     initializeBreadcrumbs();
     initializeForms();
     initializeCustomizationPanel();
+    initializeCustomizationControls();
+    initializeCustomDropdowns();
 });
 
 
@@ -651,6 +653,178 @@ function initializeCustomizationPanel() {
     }
 }
 
+// Centralized initialization for customization controls (no inline handlers)
+function initializeCustomizationControls() {
+    // Panel toggle buttons
+    const panelToggle = document.getElementById('panelToggle');
+    const panelClose = document.getElementById('panelClose');
+    const panelPull = document.getElementById('panelPullTab');
+    if (panelToggle) panelToggle.addEventListener('click', togglePanel);
+    if (panelClose) panelClose.addEventListener('click', togglePanel);
+    if (panelPull) panelPull.addEventListener('click', togglePanel);
+
+    // Theme select
+    const themeSelect = document.getElementById('themeSelect');
+    if (themeSelect) themeSelect.addEventListener('change', function (e) { changeTheme(e.target.value); });
+
+    // Sliders: font size and border radius
+    const fontSize = document.getElementById('fontSize');
+    const borderRadius = document.getElementById('borderRadius');
+    if (fontSize) fontSize.addEventListener('input', function (e) { changeFontSize(e.target.value); updateSliderValue(e.target, 'fontSizeValue'); });
+    if (borderRadius) borderRadius.addEventListener('input', function (e) { changeBorderRadius(e.target.value); updateSliderValue(e.target, 'borderRadiusValue'); });
+
+    // Reset styles button
+    const resetBtn = document.getElementById('resetStylesBtn');
+    if (resetBtn) resetBtn.addEventListener('click', resetStyles);
+
+    // Primary color swatches: click delegation
+    const primaryGroup = document.getElementById('primaryColorGroup');
+    if (primaryGroup) {
+        primaryGroup.addEventListener('click', function (e) {
+            const swatch = e.target.closest('.color-swatch');
+            if (!swatch) return;
+            const input = swatch.querySelector('input[type="radio"]');
+            if (!input) return;
+            input.checked = true;
+            const color = input.value;
+            changeColor('primary', color);
+            // Visual active state
+            primaryGroup.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('active'));
+            swatch.querySelector('.color-option').classList.add('active');
+        });
+    }
+
+    // Initialize caret and label span for custom category toggle (if present)
+    const categoryToggle = document.getElementById('categoryToggle');
+    if (categoryToggle) {
+        // Wrap existing text in a span so we can update label without removing caret
+        const existingText = categoryToggle.textContent.trim();
+        categoryToggle.textContent = '';
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'dropdown-label';
+        labelSpan.textContent = existingText || 'Select a category';
+        const caret = document.createElement('span');
+        caret.className = 'caret';
+        categoryToggle.appendChild(labelSpan);
+        categoryToggle.appendChild(caret);
+    }
+}
+
+// Focus trap for the dropdown list: keeps keyboard focus inside the list while open
+function trapFocusInDropdown(listElement, toggleButton) {
+    const focusable = Array.from(listElement.querySelectorAll('.dropdown-item'));
+    if (focusable.length === 0) return;
+
+    function handleKey(e) {
+        if (e.key !== 'Tab') return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey) {
+            if (document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            }
+        } else {
+            if (document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
+        }
+    }
+
+    listElement.addEventListener('keydown', handleKey);
+    // Return a disposer to remove the handler if needed
+    return function dispose() { listElement.removeEventListener('keydown', handleKey); };
+}
+
+// Initialize custom dropdowns used in forms (Category)
+function initializeCustomDropdowns() {
+    const dropdown = document.getElementById('categoryDropdown');
+    if (!dropdown) return;
+
+    const toggle = document.getElementById('categoryToggle');
+    const list = dropdown.querySelector('.dropdown-list');
+    const hiddenInput = document.getElementById('categoryInput');
+    const items = Array.from(list.querySelectorAll('.dropdown-item'));
+
+    let disposeTrap = null;
+    function closeDropdown() {
+        dropdown.setAttribute('aria-expanded', 'false');
+        if (disposeTrap) { disposeTrap(); disposeTrap = null; }
+    }
+
+    function openDropdown() {
+        dropdown.setAttribute('aria-expanded', 'true');
+        // install focus trap for keyboard Tab cycling
+        if (!disposeTrap) disposeTrap = trapFocusInDropdown(list, toggle);
+    }
+
+    function selectItem(item) {
+        const value = item.getAttribute('data-value') || '';
+        const label = item.textContent.trim();
+        hiddenInput.value = value;
+        const labelSpan = toggle.querySelector('.dropdown-label');
+        if (labelSpan) labelSpan.textContent = label;
+        items.forEach(it => it.setAttribute('aria-selected', 'false'));
+        item.setAttribute('aria-selected', 'true');
+        closeDropdown();
+    }
+
+    // Click handlers
+    toggle.addEventListener('click', function (e) {
+        const expanded = dropdown.getAttribute('aria-expanded') === 'true';
+        if (expanded) closeDropdown(); else openDropdown();
+    });
+
+    items.forEach(it => {
+        it.addEventListener('click', function (e) {
+            selectItem(it);
+        });
+    });
+
+    // Keyboard support: Enter/Space to open/select; Arrow keys to navigate
+    toggle.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            openDropdown();
+            items[0].focus();
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            openDropdown();
+            items[items.length - 1].focus();
+        }
+    });
+
+    list.addEventListener('keydown', function (e) {
+        const focused = document.activeElement;
+        const idx = items.indexOf(focused);
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const next = items[Math.min(items.length - 1, Math.max(0, idx + 1))];
+            if (next) next.focus();
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            const prev = items[Math.max(0, idx - 1)];
+            if (prev) prev.focus();
+        } else if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            if (document.activeElement && document.activeElement.classList.contains('dropdown-item')) {
+                selectItem(document.activeElement);
+            }
+        } else if (e.key === 'Escape') {
+            closeDropdown();
+            toggle.focus();
+        }
+    });
+
+    // Close when clicking away
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('#categoryDropdown')) {
+            closeDropdown();
+        }
+    });
+}
+
 function togglePanel() {
     document.getElementById("customPanel").classList.toggle("open");
 }
@@ -658,7 +832,14 @@ function togglePanel() {
 function changeColor(variable, color) {
     document.documentElement.style.setProperty(`--${variable}`, color);
     document.querySelectorAll(".color-option").forEach(option => option.classList.remove("active"));
-    event.target.classList.add("active");
+    // mark the matching color-option active
+    const inputs = document.querySelectorAll('#primaryColorGroup input[type="radio"]');
+    inputs.forEach(inp => {
+        if (inp.value === color) {
+            const opt = inp.closest('.color-swatch').querySelector('.color-option');
+            if (opt) opt.classList.add('active');
+        }
+    });
     showToast(`Primary color changed`, "success");
 }
 
